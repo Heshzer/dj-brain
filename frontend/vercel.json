@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://marcib.ddns.net:4000/api/:path*"
+      "destination": "http://marcib.ddns.net:4000/api/:path*"
     }
   ]
 }
