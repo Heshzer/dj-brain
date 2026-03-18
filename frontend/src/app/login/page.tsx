@@ -34,7 +34,7 @@ export default function LoginPage() {
         setError(data.error || 'Erreur de connexion');
       }
     } catch (err) {
-      setError('Erreur réseau. Le serveur backend est-il lancé sur le port 4000 ?');
+      setError('Erreur réseau. Le serveur backend est-il lancé et accessible ?');
     } finally {
       setIsSubmitting(false);
     }

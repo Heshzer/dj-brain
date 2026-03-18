@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           <p className="font-medium tracking-[0.2em] text-sm mb-4" style={{ color: '#a855f7' }}>LOADING DJ BRAIN...</p>
           <div className="text-center text-xs space-y-1" style={{ color: '#6b6b9a' }}>
             <p>Connexion au serveur backend locale...</p>
-            <p className="italic opacity-70">(Si ça bloque ici, vérifiez que le port 4000 est bien ouvert sur la box)</p>
+            <p className="italic opacity-70">(Si ça bloque ici, vérifiez que le port 80 est bien redirigé sur la box)</p>
           </div>
         </div>
       </div>
