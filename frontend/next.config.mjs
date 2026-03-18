@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+<<<<<<< HEAD
     async rewrites() {
       return [
         {
@@ -13,3 +14,8 @@ const nextConfig = {
   }
   
   export default nextConfig
+=======
+      // Proxy manuel via /api/[...proxy]/route.ts pour contourner le blocage Vercel
+}
+export default nextConfig
+>>>>>>> 1351584d9af0da47f8624639f0eaef0af43923ac
