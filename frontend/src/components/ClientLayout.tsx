@@ -10,7 +10,7 @@ import { AudioPlayerProvider } from './AudioPlayerProvider';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   
   const isLoginPage = pathname === '/login';
 
@@ -18,34 +18,63 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return <main className="flex-1 w-full">{children}</main>;
   }
 
-  // If we are not on login page and not authenticated, AuthProvider already handles redirecting
   if (!isAuthenticated) return null;
 
   return (
     <AudioPlayerProvider>
-      {/* Header Navigation */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-zinc-800 bg-zinc-950/80">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 h-16">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tighter text-white">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-900/50">
-              <ListMusic size={18} />
+      {/* Header */}
+      <header className="sticky top-0 z-40 w-full transition-colors duration-500"
+        style={{
+          background: 'rgba(6,6,14,0.85)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(139,92,246,0.1)',
+        }}>
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-5 h-16">
+          
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 glow-violet transition-all group-hover:scale-105"
+              style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)' }}>
+              <ListMusic size={18} className="text-white" />
             </div>
-            DJ Brain
+            <span className="text-lg font-bold tracking-tight gradient-text">DJ Brain</span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/" className="hover:text-purple-400 transition-colors">Library</Link>
-            <Link href="/upload" className="flex items-center gap-2 hover:text-purple-400 transition-colors">
-              <UploadCloud size={16} /> Upload
+
+          {/* Nav */}
+          <nav className="flex items-center gap-1 text-sm font-medium">
+            <Link 
+              href="/" 
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{
+                color: pathname === '/' ? '#a855f7' : '#6b6b9a',
+                background: pathname === '/' ? 'rgba(168,85,247,0.1)' : 'transparent',
+              }}
+            >
+              Library
             </Link>
-            <button onClick={logout} className="flex items-center gap-2 text-zinc-400 hover:text-red-400 transition-colors ml-4 border-l border-zinc-800 pl-4">
-              <LogOut size={16} /> Quitter
+            <Link 
+              href="/upload"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={{
+                color: pathname === '/upload' ? '#a855f7' : '#6b6b9a',
+                background: pathname === '/upload' ? 'rgba(168,85,247,0.1)' : 'transparent',
+              }}
+            >
+              <UploadCloud size={15} /> Upload
+            </Link>
+            <button 
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all ml-2"
+              style={{ color: '#3d3d6b', borderLeft: '1px solid rgba(139,92,246,0.1)', borderRadius: 0, paddingLeft: '1rem' }}
+            >
+              <LogOut size={15} />
             </button>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-5 py-8">
         {children}
       </main>
 

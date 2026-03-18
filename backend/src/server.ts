@@ -14,8 +14,20 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000;
 
+const allowedOrigins = [
+  'https://dj-brain.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: true, // Allow all origins for local network testing
+  origin: (origin, callback) => {
+    // Autoriser les requêtes sans origin (ex: mobile apps, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
   credentials: true
 }));
 app.use(express.json());

@@ -18,58 +18,79 @@ export default function TrackItem({ track, allTags = [], playlist = [] }: { trac
   };
 
   return (
-    <div 
-      className={cn(
-        "group relative flex flex-col p-4 rounded-xl border transition-all mb-3 cursor-pointer overflow-hidden",
-        isCurrent ? "bg-purple-900/20 border-purple-500/50" : "bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900"
-      )}
+    <div
+      className="group relative flex flex-col p-4 rounded-2xl cursor-pointer overflow-hidden mb-2 transition-all duration-300"
+      style={{
+        background: isCurrent
+          ? 'linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.08) 100%)'
+          : 'rgba(13,13,26,0.6)',
+        border: `1px solid ${isCurrent ? 'rgba(168,85,247,0.35)' : 'rgba(139,92,246,0.08)'}`,
+        boxShadow: isCurrent ? '0 0 30px rgba(168,85,247,0.1), inset 0 1px 0 rgba(168,85,247,0.1)' : 'none',
+      }}
       onClick={handlePlay}
     >
-      {/* Ligne principale */}
+      {/* Active indicator line */}
+      {isCurrent && (
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-2xl"
+          style={{ background: 'linear-gradient(180deg, #a855f7, #ec4899)' }} />
+      )}
+
       <div className="flex items-center gap-4">
+        {/* Play Button */}
         <button
-          className={cn(
-            "w-12 h-12 flex items-center justify-center rounded-full shrink-0 transition-transform",
-            isCurrent ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]" : "bg-zinc-800 text-zinc-300 group-hover:bg-zinc-700"
-          )}
+          className="w-12 h-12 flex items-center justify-center rounded-xl shrink-0 transition-all duration-200"
+          style={{
+            background: isCurrent
+              ? 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)'
+              : 'rgba(139,92,246,0.08)',
+            boxShadow: isCurrent ? '0 0 20px rgba(168,85,247,0.4)' : 'none',
+            color: isCurrent ? '#fff' : '#6b6b9a',
+            transform: 'scale(1)',
+          }}
         >
           {isCurrent && isPlaying
-            ? <Pause fill="currentColor" size={20} />
-            : <Play fill="currentColor" size={20} className="ml-1" />}
+            ? <Pause fill="currentColor" size={18} />
+            : <Play fill="currentColor" size={18} className="ml-0.5" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-zinc-100 truncate flex items-center gap-2 flex-wrap">
-            {track.file_name}
+          <h4 className="font-semibold truncate flex items-center gap-2 flex-wrap text-sm"
+            style={{ color: isCurrent ? '#e9d5ff' : '#c4b5fd99' }}>
+            <span style={{ color: isCurrent ? '#f1f0ff' : '#c4c0e8' }}>{track.file_name}</span>
             {track.sync_status === 'PENDING' && (
-              <span className="text-[10px] bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Non Synced</span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold"
+                style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                Non Synced
+              </span>
             )}
             {track.sync_status === 'SYNCED' && (
-              <span className="text-[10px] flex items-center gap-1 text-green-500"><CheckCircle2 size={12} /> Synced</span>
+              <span className="text-[9px] flex items-center gap-1" style={{ color: '#34d399' }}>
+                <CheckCircle2 size={10} /> Synced
+              </span>
             )}
           </h4>
 
-          {/* Tags actuels */}
+          {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {localTags.map((t: string) => {
               const tagObj = allTags.find(gt => gt.name === t);
               const isPerm = tagObj?.is_permanent;
-              const bgColor = isPerm ? (tagObj?.color || '#444444') : 'transparent';
-              const textColor = isPerm ? '#ffffff' : '#a1a1aa';
-              const borderColor = isPerm ? 'transparent' : '#3f3f46';
-              
+              const bgColor = isPerm ? (tagObj?.color || '#7c3aed') : 'transparent';
+              const textColor = isPerm ? '#ffffff' : '#6b6b9a';
+              const borderColor = isPerm ? 'transparent' : 'rgba(139,92,246,0.2)';
+
               return (
-                <span 
-                  key={t} 
-                  className="text-[10px] px-2 py-0.5 rounded-md border font-medium truncate shadow-sm"
-                  style={{ backgroundColor: bgColor, color: textColor, borderColor }}
+                <span
+                  key={t}
+                  className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                  style={{ backgroundColor: bgColor, color: textColor, border: `1px solid ${borderColor}` }}
                 >
                   {t}
                 </span>
               );
             })}
             {localTags.length === 0 && (
-              <span className="text-[10px] text-zinc-600 italic">Aucun tag</span>
+              <span className="text-[10px] italic" style={{ color: '#3d3d6b' }}>Aucun tag</span>
             )}
           </div>
         </div>
