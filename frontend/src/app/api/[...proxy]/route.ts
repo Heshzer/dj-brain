@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest, { params }: { params: { proxy: string[] } }) { return proxyRequest(request, params.proxy); }
-export async function POST(request: NextRequest, { params }: { params: { proxy: string[] } }) { return proxyRequest(request, params.proxy); }
-export async function PUT(request: NextRequest, { params }: { params: { proxy: string[] } }) { return proxyRequest(request, params.proxy); }
-export async function DELETE(request: NextRequest, { params }: { params: { proxy: string[] } }) { return proxyRequest(request, params.proxy); }
-export async function PATCH(request: NextRequest, { params }: { params: { proxy: string[] } }) { return proxyRequest(request, params.proxy); }
+type RouteParams = { params: Promise<{ proxy: string[] }> };
+
+export async function GET(request: NextRequest, { params }: RouteParams) { const p = await params; return proxyRequest(request, p.proxy); }
+export async function POST(request: NextRequest, { params }: RouteParams) { const p = await params; return proxyRequest(request, p.proxy); }
+export async function PUT(request: NextRequest, { params }: RouteParams) { const p = await params; return proxyRequest(request, p.proxy); }
+export async function DELETE(request: NextRequest, { params }: RouteParams) { const p = await params; return proxyRequest(request, p.proxy); }
+export async function PATCH(request: NextRequest, { params }: RouteParams) { const p = await params; return proxyRequest(request, p.proxy); }
 
 async function proxyRequest(request: NextRequest, proxyPath: string[]) {
   try {
