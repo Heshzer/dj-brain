@@ -1,0 +1,127 @@
+========================================================
+  DJ BRAIN — CHECKPOINT DU PROJET
+  Date : 16 Mars 2026
+========================================================
+
+============================
+✅ CE QUI EST FAIT
+============================
+
+1. ARCHITECTURE & PLAN
+   - Architecture complète définie (3 composants: Web App, Backend API, Desktop Agent)
+   - Schéma base de données conçu (tables: tracks, tags, dj_metadata, track_tags, users)
+   - Plan de synchronisation Rekordbox (format #djtags: tag1;tag2 dans le champ Comment)
+   - Système de backup/restauration en cas d'erreur d'écriture de tags
+
+2. BACKEND API (Node.js / Express / TypeScript)
+   Dossier : C:\Users\PC\EasyPeazy\dj-brain\backend\
+   - Serveur Express configuré (port 4000)
+   - Connexion PostgreSQL (base de données : djbrain sur localhost:5432)
+   - Upload de fichiers audio → envoi direct sur le FTP du serveur ami
+   - Streaming audio à la volée depuis FTP (lecture dans la Web App)
+   - API de gestion des tags et notes (PUT /api/tracks/:id/metadata)
+   - Endpoint de synchronisation pour l'Agent Desktop (GET /api/sync/changes)
+   - Accusé de réception de sync (POST /api/sync/ack)
+   - Identifiants FTP déjà configurés dans le fichier backend/.env :
+       FTP_HOST = marcib.ddns.net
+       FTP_USER = sucemabite
+       FTP_PASS = Onelifedj@93
+       FTP_PORT = 21
+
+3. BASE DE DONNÉES (PostgreSQL)
+   - Base de données "djbrain" créée manuellement sur localhost
+   - Schéma SQL disponible : backend/src/database/schema.sql
+   ⚠️ IMPORTANT : Le script schema.sql N'A PAS encore été exécuté sur la base locale.
+     Pour l'exécuter, depuis pgAdmin 4, ouvrir djbrain > Tools > Query Tool
+     et coller le contenu du fichier schema.sql, puis exécuter (F5).
+
+4. WEB APP FRONTEND (Next.js + TailwindCSS + PWA)
+   Dossier : C:\Users\PC\EasyPeazy\dj-brain\frontend\
+   - Navigation avec header Bibliothèque / Upload
+   - Lecteur audio persistant (barre en bas, reste actif pendant navigation)
+   - Bibliothèque de morceaux : liste avec tags, notes, statut de sync
+   - Système de Quick-Tagging : tags prédéfinis (afro, warmup, vocal, etc.)
+   - Notes privées par morceau
+   - Barre de recherche (par nom, tag, note)
+   - Page Upload avec interface Drag & Drop (Uppy)
+   - Next.js proxy configuré → les appels API sont relatifs (/api/...)
+     pour permettre l'accès depuis mobile et réseau local
+
+5. AGENT DESKTOP (Python + CustomTkinter + Mutagen)
+   Dossier : C:\Users\PC\EasyPeazy\dj-brain\desktop-agent\
+   - Interface graphique avec CustomTkinter (fenêtre standalone)
+   - Connexion à l'API du Backend pour récupérer les changements
+   - Scan d'un dossier / clé USB locale
+   - Correspondance fichier local ↔ track serveur (par nom de fichier)
+   - Écriture sécurisée des tags ID3 via Mutagen (format Rekordbox : #djtags:...)
+   - Backup automatique avant modification + restauration si erreur
+   - Accusé de réception des syncs réussies vers l'API
+
+
+============================
+🧪 ÉTAT DES TESTS
+============================
+
+- ✅ Backend démarre correctement (npm run dev dans /backend)
+- ✅ Frontend démarre correctement (npm run dev dans /frontend)
+- ⚠️ Page Library : erreur corrigée (filtre sur array null)
+- ❌ Page Upload : erreur CSS Uppy à corriger (voir section suivante)
+- ❌ Schéma SQL pas encore appliqué à la base djbrain
+
+
+============================
+🔴 CE QUI RESTE À FAIRE
+============================
+
+1. [BUGFIX IMMÉDIAT] Corriger l'import CSS Uppy dans la page Upload
+   → Le fichier 'style.min.css' n'est plus au même chemin avec les nouvelles versions Uppy
+   → À corriger dans : frontend/src/app/upload/page.tsx
+
+2. [SETUP LOCAL] Appliquer le schéma SQL sur la base PostgreSQL locale
+   → Ouvrir pgAdmin 4, connecter à djbrain, ouvrir Query Tool
+   → Coller et exécuter le contenu de : backend/src/database/schema.sql
+
+3. [TEST COMPLET] Tester l'upload d'un fichier MP3 depuis le navigateur
+   → Vérifier qu'il arrive bien sur le FTP marcib.ddns.net
+
+4. [SÉCURITÉ] Ajouter le système de Login/Mot de passe
+   → Écran de connexion (email + mot de passe)
+   → Sessions sécurisées (JWT ou session cookie)
+   → Actuellement, n'importe qui avec le lien peut accéder à l'application
+
+5. [DÉPLOIEMENT CLOUD - ÉTAPE CLÉ]
+   Pour accéder à l'app en 4G depuis l'iPhone, il faut héberger
+   le Backend et le Frontend sur le serveur distant (pas sur le PC Windows local).
+   Étapes à suivre avec l'ami :
+     a. Installer Docker + Docker Compose sur le serveur
+     b. On fournit un docker-compose.yml tout prêt (Backend + PostgreSQL)
+     c. Déployer le Frontend sur Vercel (gratuit, 3 clics)
+     d. Configurer un nom de domaine (ou utiliser l'adresse ddns.net)
+     e. Activer HTTPS (obligatoire pour l'audio PWA sécurisé)
+     f. Migrer la base de données depuis le PC local vers le serveur
+
+6. [FONCTIONNALITÉ] Agent Desktop : Ajouter correspondance par hash SHA-256
+   → Pour éviter les faux positifs si deux fichiers ont le même nom
+
+7. [FONCTIONNALITÉ] PWA Manifest
+   → Créer public/manifest.json pour permettre installation sur iPhone comme une vraie app
+
+============================
+COMMANDES DE DÉMARRAGE
+============================
+
+# Terminal 1 - Backend API
+cd C:\Users\PC\EasyPeazy\dj-brain\backend
+npm run dev
+
+# Terminal 2 - Web App
+cd C:\Users\PC\EasyPeazy\dj-brain\frontend
+npm run dev
+→ Puis ouvrir : http://localhost:3000
+
+# Terminal 3 - Agent Desktop
+cd C:\Users\PC\EasyPeazy\dj-brain\desktop-agent
+venv\Scripts\activate
+python main.py
+
+========================================================

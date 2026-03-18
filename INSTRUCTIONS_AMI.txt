@@ -1,0 +1,58 @@
+==========================================================
+INSTRUCTIONS POUR L'HEBERGEMENT DE DJ-BRAIN SUR WINDOWS
+==========================================================
+
+Salut ! Ton pote a besoin de ton aide pour héberger son application "DJ Brain" sur ton serveur Windows. 
+Le but est que l'application tourne directement à la source des musiques (là où ton serveur FTP de FileZilla stocke les sons), pour qu'il puisse y accéder et les écouter depuis son téléphone en 4G.
+
+========== PRÉ-REQUIS POUR TOI ==========
+
+1. Tu dois installer **Docker Desktop pour Windows** si ce n'est pas déjà fait :
+   Lien: https://docs.docker.com/desktop/install/windows-install/
+   (Assure-toi que WSL 2 est bien activé pendant l'installation).
+2. Ouvre Docker Desktop et laisse-le tourner en arrière-plan.
+
+========== ÉTAPE 1 : PRÉPARATION ==========
+
+1. Prends le dossier `dj-brain` que ton pote t'a envoyé et place-le quelque part sur ton serveur Windows (ex: `C:\dj-brain`).
+2. Ouvre le fichier `docker-compose.yml` qui se trouve à l'intérieur avec le Bloc-notes.
+
+========== ÉTAPE 2 : CONFIGURATION DU CHEMIN DES MUSIQUES ==========
+
+C'est l'étape clé. Dans le bloc-notes, cherche la ligne 20 (sous `backend:` -> `volumes:`), tu verras ça :
+
+      - /remplacer/par/le/chemin/absolu/du/ftp/tracks:/dj-library/tracks
+
+Remplace la partie de GAUCHE par le VRAI chemin Windows du dossier où tombent les musiques envoyées par FileZilla.
+**ATTENTION AU FORMAT DOCKER SOUS WINDOWS** : Tu dois utiliser des slashs normaux `/` et non des antislashs `\`, et mettre un slash au début.
+Exemple si ton dossier est `C:\FTP\Musiques\` :
+      - /C/FTP/Musiques:/dj-library/tracks
+
+Grâce à cela, quand le DJ enverra sa musique via FileZilla, le serveur la détectera instantanément !
+
+========== ÉTAPE 3 : CONFIGURATION DU RÉSEAU ==========
+
+Dans ce même bloc-notes, cherche la ligne 34 (sous `frontend:` -> `environment:`) :
+
+      - NEXT_PUBLIC_API_URL=http://marcib.ddns.net:4000/api
+
+Vérifie que c'est bien la bonne adresse de domaine (ou IP externe) pour accéder à ton serveur depuis l'extérieur. 
+Si c'est bon, sauvegarde et ferme le bloc-notes.
+
+========== ÉTAPE 4 : LANCEMENT DE L'APPLICATION ==========
+
+1. Ouvre l'Invite de commandes Windows (`cmd`) en tant qu'administrateur.
+2. Navigue vers le dossier `dj-brain` :
+   > cd C:\dj-brain
+3. Lance l'application avec Docker :
+   > docker-compose up -d --build
+
+Docker va créer la base de données, compiler le code et tout lancer d'un coup.
+
+========== DERNIÈRE ÉTAPE : LE PARE-FEU ==========
+
+Pour que ton pote puisse y accéder depuis son téléphone dans la rue :
+1. Sur ta Box Internet, redirige les ports **3000** (Web App) et **4000** (API Backend) vers l'IP locale de ton PC Windows.
+2. Dans le "Pare-feu Windows Defender", crée une Règle de trafic entrant pour autoriser les ports TCP 3000 et 4000.
+
+L'application Web sera alors accessible de partout sur : http://marcib.ddns.net:3000

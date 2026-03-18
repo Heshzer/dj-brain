@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: djbrain
+      POSTGRES_PASSWORD: djpassword
+      POSTGRES_DB: djbrain
+    volumes:
+      - djbrain_data:/var/lib/postgresql/data
+      - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://djbrain:djpassword@db:5432/djbrain
+      - PORT=4000
+      - FRONTEND_URL=${FRONTEND_URL:-*}
+    volumes:
+      - ${HOST_AUDIO_PATH}:/dj-library/tracks
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+
+volumes:
+  djbrain_data:

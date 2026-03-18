@@ -1,0 +1,44 @@
+# Dépendances
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+.next/
+dist/
+build/
+out/
+
+# Environnement (NE JAMAIS committer les secrets !)
+.env
+.env.local
+.env.production
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+pgsql/
+pgsql.zip
+
+# Desktop Agent venv Python
+desktop-agent/venv/
+desktop-agent/__pycache__/
+desktop-agent/*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Gros fichiers inutiles
+*.zip
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+yt-dlp.exe
