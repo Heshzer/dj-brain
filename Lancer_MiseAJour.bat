@@ -4,8 +4,23 @@ echo ==============================================
 echo    MISE A JOUR DJ BRAIN - SERVEUR v2.0
 echo ==============================================
 echo.
-echo Telechargement et lancement du script...
+
+echo [1/2] Telechargement de la derniere version depuis GitHub...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "(New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/Heshzer/dj-brain/main/mise_a_jour_serveur.ps1', '%~dp0mise_a_jour_serveur.ps1')"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [ERREUR] Impossible de telecharger le script.
+    echo Verifiez votre connexion internet et reessayez.
+    pause
+    exit /b 1
+)
+
+echo [OK] Script telecharge.
 echo.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -Command ""$s=[System.Net.WebClient]::new(); $s.Encoding=[System.Text.Encoding]::UTF8; $script=$s.DownloadString(''https://raw.githubusercontent.com/Heshzer/dj-brain/main/mise_a_jour_serveur.ps1''); $tmp=[System.IO.Path]::GetTempFileName()+''''.ps1''''; [System.IO.File]::WriteAllText($tmp,$script,[System.Text.Encoding]::UTF8); Set-Location ''R:\Partage Hanny EL SAYED''; & $tmp; Remove-Item $tmp -ErrorAction SilentlyContinue""' -Verb RunAs -Wait"
+echo [2/2] Lancement avec droits administrateur...
+echo     ^(La fenetre PowerShell DOIT rester ouverte - lisez les messages^)
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -ArgumentList '-NoProfile -NoExit -ExecutionPolicy Bypass -File ""%~dp0mise_a_jour_serveur.ps1""' -Verb RunAs -Wait"
 echo.
 pause
