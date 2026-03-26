@@ -94,6 +94,28 @@ try {
     Write-Host "  [ATTENTION] Mise a jour Git echouee. Verifiez manuellement." -ForegroundColor DarkYellow
 }
 
+# Trouver le docker-compose.yml
+Write-Host ""
+Write-Host "[?] Recherche de docker-compose.yml..." -ForegroundColor Yellow
+$composeFile = $null
+if (Test-Path "$PSScriptRoot\docker-compose.yml") {
+    $composeFile = "$PSScriptRoot\docker-compose.yml"
+} else {
+    $found = Get-ChildItem -Path $PSScriptRoot -Filter "docker-compose.yml" -Recurse -Depth 3 -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($found) { $composeFile = $found.FullName }
+}
+
+if (-not $composeFile) {
+    Write-Host "  [ERREUR] docker-compose.yml introuvable !" -ForegroundColor Red
+    Write-Host "  Verifiez que le dossier dj-brain est complet." -ForegroundColor Red
+    Read-Host "Appuyez sur Entree pour quitter"
+    exit 1
+}
+
+$composeDir = Split-Path $composeFile
+Write-Host "  [OK] docker-compose.yml trouve dans : $composeDir" -ForegroundColor Green
+Set-Location $composeDir
+
 # 5. ARRET DES CONTENEURS
 Write-Host ""
 Write-Host "[5/6] Arret des anciens conteneurs DJ Brain..." -ForegroundColor Yellow

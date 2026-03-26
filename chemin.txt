@@ -1,14 +1,38 @@
 ‪Set-ExecutionPolicy Bypass -Scope Process -Force; & "R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1"
 
 
-PS C:\WINDOWS\system32> Set-ExecutionPolicy Bypass -Scope Process -Force; & "R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1"
-Au caractère R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1:147 : 43
-+ Read-Host "Appuyez sur Entree pour quitter"
-+                                           ~
-Le terminateur " est manquant dans la chaîne.
-Au caractère R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1:79 : 15
-+ if ($localIp) {
-+               ~
-Accolade fermante « } » manquante dans le bloc d'instruction ou définition du type manquante.
-    + CategoryInfo          : ParserError: (:) [], ParseException
-    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString
+
+=============================================
+     MISE A JOUR DJ BRAIN - SERVEUR v2.0
+=============================================
+
+[1/6] Verification de Docker...
+  [OK] Docker version 29.2.1, build a5c7197
+
+[2/6] Configuration Docker au demarrage Windows...
+  [INFO] Docker Desktop non trouve au chemin standard.
+
+[3/6] Detection de votre adresse IP locale...
+  [INFO] IP non detectee. Tapez 'ipconfig' en cmd pour la trouver.
+
+[4/6] Telechargement du code depuis GitHub...
+  [ATTENTION] Mise a jour Git echouee. Verifiez manuellement.
+
+[5/6] Arret des anciens conteneurs DJ Brain...
+no configuration file provided: not found
+1
+  [OK] Conteneurs arretes.
+
+[6/6] Reconstruction et relancement (2-3 minutes)...
+no configuration file provided: not found
+
+  [ERREUR] docker compose a retourne une erreur. Voir les logs ci-dessus.
+
+=============================================
+                RESUME FINAL
+=============================================
+
+  [OK] Docker configure pour demarrer au boot
+  [OK] Conteneurs DJ Brain relances
+
+  L'app est accessible sur : http://marcib.ddns.net:3000
