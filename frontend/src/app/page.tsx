@@ -5,7 +5,14 @@ import TrackItem from '@/components/TrackItem';
 import { Search, Disc3 } from 'lucide-react';
 import { useState } from 'react';
 
-const fetcher = (url: string) => fetch(url.startsWith('http') ? url : `/api${url}`).then(r => r.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url.startsWith('http') ? url : `/api${url}`);
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'API error');
+  }
+  return res.json();
+};
 
 export default function Home() {
   const { data: tracks, error, isLoading } = useSWR('/tracks', fetcher, { refreshInterval: 5000 });
@@ -18,13 +25,13 @@ export default function Home() {
     </div>
   );
 
-  const filteredTracks = tracks?.filter((t: any) => {
+  const filteredTracks = Array.isArray(tracks) ? tracks.filter((t: any) => {
     if (!search) return true;
     const s = search.toLowerCase();
     return t.file_name.toLowerCase().includes(s)
-      || t.tags.some((tag: any) => tag.name.toLowerCase().includes(s))
+      || t.tags?.some((tag: any) => tag.name.toLowerCase().includes(s))
       || t.notes?.toLowerCase().includes(s);
-  }) || [];
+  }) : [];
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
