@@ -25,16 +25,25 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password })
       });
       
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        if (!res.ok) {
+          throw new Error(`Le serveur backend a répondu avec une erreur inattendue (Code ${res.status}). Le serveur est-il bien à jour avec la dernière version ?`);
+        }
+        throw new Error('Réponse invalide du serveur.');
+      }
       
       if (res.ok) {
         await checkAuth();
         router.push('/');
       } else {
-        setError(data.error || 'Erreur de connexion');
+        setError(data?.error || 'Erreur de connexion');
       }
-    } catch (err) {
-      setError('Erreur réseau. Le serveur backend est-il lancé et accessible ?');
+    } catch (err: any) {
+      setError(err.message || 'Erreur réseau. Le serveur backend est-il lancé et accessible ?');
     } finally {
       setIsSubmitting(false);
     }

@@ -1,16 +1,42 @@
 <#
 .SYNOPSIS
-Script de mise à jour automatique DJ-Brain v2.0
-Ce script : vérifie Docker, récupère ton IP locale, active Docker au démarrage, et relance les conteneurs.
+Script de mise a jour automatique DJ-Brain v2.0
+Ce script verifie Docker, recupere l'IP locale, active Docker au demarrage, et relance les conteneurs.
 #>
 
-$ErrorActionPreference = "Stop"
+# Ne pas fermer sur erreur - on gere nous-memes
+$ErrorActionPreference = "Continue"
 
-# Demande élévation Admin si nécessaire
+# Demande elevation Admin si necessaire
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Warning "Droits administrateur requis. Relancement..."
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
+}
+
+# Fonction helper : lance docker-compose ou docker compose selon version Docker
+function Invoke-DockerCompose {
+    param([string[]]$CmdArgs)
+    $hasOld = $null -ne (Get-Command "docker-compose" -ErrorAction SilentlyContinue)
+    if ($hasOld) {
+        & docker-compose @CmdArgs
+    } else {
+        & docker compose @CmdArgs
+    }
+    return $LASTEXITCODE
+}
+
+# Garde-fou global : fenetre reste ouverte si crash
+trap {
+    Write-Host ""
+    Write-Host "============================================" -ForegroundColor Red
+    Write-Host "  ERREUR INATTENDUE - COPIEZ CE MESSAGE     " -ForegroundColor Red
+    Write-Host "============================================" -ForegroundColor Red
+    Write-Host ($_.Exception.Message) -ForegroundColor Red
+    Write-Host ($_.ScriptStackTrace) -ForegroundColor DarkRed
+    Write-Host ""
+    Read-Host "Appuyez sur Entree pour quitter (envoyez ce message a Marc)"
+    break
 }
 
 Write-Host ""
@@ -19,8 +45,8 @@ Write-Host "     MISE A JOUR DJ BRAIN - SERVEUR v2.0     " -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ─── 1. VÉRIFICATION DOCKER ─────────────────────────────────────────────────
-Write-Host "[1/5] Verification de Docker..." -ForegroundColor Yellow
+# 1. VERIFICATION DOCKER
+Write-Host "[1/6] Verification de Docker..." -ForegroundColor Yellow
 try {
     $dockerVersion = & docker --version 2>&1
     Write-Host "  [OK] $dockerVersion" -ForegroundColor Green
@@ -31,80 +57,76 @@ try {
     exit
 }
 
-# ─── 2. DOCKER DÉMARRE AU BOOT ──────────────────────────────────────────────
+# 2. DOCKER AU BOOT
 Write-Host ""
-Write-Host "[2/5] Configuration de Docker pour demarrer au boot Windows..." -ForegroundColor Yellow
+Write-Host "[2/6] Configuration Docker au demarrage Windows..." -ForegroundColor Yellow
 $dockerDesktopPath = "$env:LOCALAPPDATA\Docker\Docker Desktop.exe"
 if (Test-Path $dockerDesktopPath) {
     $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     Set-ItemProperty -Path $regPath -Name "Docker Desktop" -Value "`"$dockerDesktopPath`"" -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Docker demarrera automatiquement au prochain boot." -ForegroundColor Green
+    Write-Host "  [OK] Docker demarrera automatiquement au boot." -ForegroundColor Green
 } else {
-    Write-Host "  [INFO] Docker Desktop non trouve au chemin standard, a verifier manuellement." -ForegroundColor DarkYellow
+    Write-Host "  [INFO] Docker Desktop non trouve au chemin standard." -ForegroundColor DarkYellow
 }
 
-# ─── 3. RÉCUPÉRER ET AFFICHER L'IP LOCALE ───────────────────────────────────
+# 3. IP LOCALE
 Write-Host ""
-Write-Host "[3/5] Detection de votre adresse IP locale..." -ForegroundColor Yellow
+Write-Host "[3/6] Detection de votre adresse IP locale..." -ForegroundColor Yellow
 $localIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
     $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.*" -and $_.PrefixOrigin -eq "Dhcp"
 } | Select-Object -First 1).IPAddress
 
 if ($localIp) {
     Write-Host "  [OK] Votre IP locale est : $localIp" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "  ║  NOTEZ CET IP POUR LA CONFIGURATION DE VOTRE BOX ║" -ForegroundColor Cyan
-    Write-Host "  ║                                                    ║" -ForegroundColor Cyan
-    Write-Host "  ║   IP Locale du serveur : $localIp" -ForegroundColor Yellow
-    Write-Host "  ║   Ports a rediriger   : 3000 et 4000 (TCP)        ║" -ForegroundColor Yellow
-    Write-Host "  ╚════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 } else {
-    Write-Host "  [INFO] IP non detectee automatiquement. Tapez 'ipconfig' en cmd pour la trouver." -ForegroundColor DarkYellow
+    Write-Host "  [INFO] IP non detectee. Tapez 'ipconfig' en cmd pour la trouver." -ForegroundColor DarkYellow
 }
 
-# ─── 4. RELANCE DES CONTENEURS DOCKER ───────────────────────────────────────
+# 4. TELECHARGEMENT DE LA DERNIERE VERSION
 Write-Host ""
-Write-Host "[4/5] Arret des anciens conteneurs DJ Brain..." -ForegroundColor Yellow
+Write-Host "[4/6] Telechargement du code depuis GitHub..." -ForegroundColor Yellow
 Set-Location $PSScriptRoot
-& docker-compose down
+try {
+    & git fetch origin 2>&1 | Out-Null
+    & git reset --hard origin/main 2>&1 | Out-Null
+    Write-Host "  [OK] Code mis a jour." -ForegroundColor Green
+} catch {
+    Write-Host "  [ATTENTION] Mise a jour Git echouee. Verifiez manuellement." -ForegroundColor DarkYellow
+}
+
+# 5. ARRET DES CONTENEURS
+Write-Host ""
+Write-Host "[5/6] Arret des anciens conteneurs DJ Brain..." -ForegroundColor Yellow
+Invoke-DockerCompose "down"
 Write-Host "  [OK] Conteneurs arretes." -ForegroundColor Green
 
+# 6. RELANCE
 Write-Host ""
-Write-Host "[5/5] Reconstruction et relancement (peut prendre 2-3 minutes)..." -ForegroundColor Yellow
-& docker-compose up -d --build
+Write-Host "[6/6] Reconstruction et relancement (2-3 minutes)..." -ForegroundColor Yellow
+$exitCode = Invoke-DockerCompose @("up", "-d", "--build")
 
-if ($LASTEXITCODE -eq 0) {
+if ($exitCode -eq 0) {
     Write-Host ""
     Write-Host "  [OK] Tous les conteneurs sont lances !" -ForegroundColor Green
     Write-Host ""
     & docker ps --format "table {{.Names}}`t{{.Status}}`t{{.Ports}}"
 } else {
     Write-Host ""
-    Write-Host "  [ERREUR] docker-compose a retourne une erreur. Voir les logs ci-dessus." -ForegroundColor Red
+    Write-Host "  [ERREUR] docker compose a retourne une erreur. Voir les logs ci-dessus." -ForegroundColor Red
 }
 
-# ─── RÉSUMÉ FINAL ────────────────────────────────────────────────────────────
+# RESUME FINAL
 Write-Host ""
 Write-Host "=============================================" -ForegroundColor Cyan
-Write-Host "                 RESUME FINAL                " -ForegroundColor Cyan
+Write-Host "                RESUME FINAL                 " -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host " [OK] Docker configure pour demarrer au boot" -ForegroundColor Green
-Write-Host " [OK] Conteneurs DJ Brain relances (version corrigee)" -ForegroundColor Green
-Write-Host ""
-Write-Host " [ACTION MANUELLE REQUISE] Configuration de la box/routeur :" -ForegroundColor Yellow
-Write-Host "   - Connectez-vous a votre box (souvent http://192.168.1.1)" -ForegroundColor White
-Write-Host "   - Cherchez : Redirection de ports / NAT / Port Forwarding" -ForegroundColor White
-Write-Host "   - Ajouter ces 2 regles :" -ForegroundColor White
+Write-Host "  [OK] Docker configure pour demarrer au boot" -ForegroundColor Green
+Write-Host "  [OK] Conteneurs DJ Brain relances" -ForegroundColor Green
 if ($localIp) {
-    Write-Host "       Port 3000 TCP  ->  $localIp : 3000" -ForegroundColor Yellow
-    Write-Host "       Port 4000 TCP  ->  $localIp : 4000" -ForegroundColor Yellow
-} else {
-    Write-Host "       Port 3000 TCP  ->  [VOTRE IP LOCALE] : 3000" -ForegroundColor Yellow
-    Write-Host "       Port 4000 TCP  ->  [VOTRE IP LOCALE] : 4000" -ForegroundColor Yellow
+    Write-Host "  [OK] IP locale du serveur : $localIp" -ForegroundColor Green
 }
 Write-Host ""
-Write-Host " Une fois fait, l'app sera accessible sur : http://marcib.ddns.net:3000" -ForegroundColor Green
+Write-Host "  L'app est accessible sur : http://marcib.ddns.net:3000" -ForegroundColor Cyan
 Write-Host ""
 Read-Host "Appuyez sur Entree pour quitter"

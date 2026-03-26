@@ -4,12 +4,34 @@ Script d'installation automatique DJ-Brain BACKEND UNIQUEMENT v2.0
 Le Frontend est desormais heberge sur Vercel - plus besoin de Docker pour ça !
 #>
 
-$ErrorActionPreference = "Stop"
+# Ne pas fermer sur erreur - on gère nous-mêmes
+$ErrorActionPreference = "Continue"
 
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Warning "Droits administrateur requis. Relancement..."
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
+}
+
+# Fonction helper : docker-compose ou docker compose selon version Docker
+function Invoke-DockerCompose {
+    param([string[]]$CmdArgs)
+    $hasOld = $null -ne (Get-Command "docker-compose" -ErrorAction SilentlyContinue)
+    if ($hasOld) { & docker-compose @CmdArgs } else { & docker compose @CmdArgs }
+    return $LASTEXITCODE
+}
+
+# ─── GARDE-FOU GLOBAL : fenêtre reste ouverte si crash ──────────────────────
+trap {
+    Write-Host ""
+    Write-Host "============================================" -ForegroundColor Red
+    Write-Host "  ERREUR INATTENDUE - COPIEZ CE MESSAGE     " -ForegroundColor Red
+    Write-Host "============================================" -ForegroundColor Red
+    Write-Host ($_.Exception.Message) -ForegroundColor Red
+    Write-Host ($_.ScriptStackTrace) -ForegroundColor DarkRed
+    Write-Host ""
+    Read-Host "Appuyez sur Entree pour quitter (envoyez ce message d'erreur a Marc)"
+    break
 }
 
 Write-Host ""
@@ -85,9 +107,9 @@ if ($port3000) {
 Write-Host ""
 Write-Host "[5/5] Lancement de la base de donnees et du backend..." -ForegroundColor Yellow
 Set-Location $PSScriptRoot
-& docker-compose up -d --build
+$exitCode = Invoke-DockerCompose @("up", "-d", "--build")
 
-if ($LASTEXITCODE -eq 0) {
+if ($exitCode -eq 0) {
     Write-Host ""
     Write-Host "  [OK] Backend et base de donnees lances !" -ForegroundColor Green
     Write-Host ""

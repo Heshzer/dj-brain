@@ -1,99 +1,37 @@
 ========================================================
-  DJ BRAIN — MISE A JOUR SERVEUR v2.0
-  Préparée le 18 Mars 2026
+  DJ BRAIN — MISE A JOUR SERVEUR
 ========================================================
 
-Salut ! Merci de prendre quelques minutes pour ça.
-Voici exactement ce que tu dois faire, dans l'ordre.
+Salut ! Juste 2 minutes, voici quoi faire.
 
 ========================================================
-ETAPE 1 — Copier les fichiers mis à jour (OBLIGATOIRE)
+ETAPE 1 — Assure-toi que Docker Desktop est ouvert
 ========================================================
 
-Dans le dossier dj-brain que tu as déjà sur ton PC,
-remplace ces 2 fichiers par ceux que je t'ai envoyés :
+Vérifie que Docker Desktop tourne bien en arrière-plan
+(l'icône baleine dans la barre des tâches).
 
-  - frontend\Dockerfile         (remplace l'ancien)
-  - frontend\next.config.mjs    (remplace l'ancien)
-
-Mets-les EXACTEMENT dans ces sous-dossiers.
-
+Si non, lance-le et attends qu'il soit prêt (30 sec).
 
 ========================================================
-ETAPE 2 — Lancer le script de mise à jour (AUTOMATIQUE)
+ETAPE 2 — Lance le script de mise à jour
 ========================================================
 
 Double-clique sur : Lancer_MiseAJour.bat
 
-Ce script va faire automatiquement :
-  ✅ Vérifier que Docker tourne
-  ✅ Configurer Docker pour démarrer au boot Windows
-  ✅ Afficher ton IP locale (note-la, tu en as besoin après)
-  ✅ Arrêter et reconstruire les conteneurs DJ Brain
+Il va automatiquement :
+  ✅ Vérifier Docker
+  ✅ Télécharger la dernière version
+  ✅ Redémarrer les conteneurs DJ Brain
 
-Laisse-le tourner jusqu'à la fin (2-3 minutes max).
-À la fin, il t'affichera un résumé et ton IP locale.
-
-
-========================================================
-ETAPE 3 — Configurer ta box/routeur (MANUEL, 5 minutes)
-========================================================
-
-Cette étape est nécessaire pour que l'iPhone puisse
-accéder au serveur depuis l'extérieur (4G, etc.)
-
-3a. Trouve ton IP locale
-    → Le script de l'étape 2 te l'aura affichée
-    → Sinon : ouvre cmd et tape "ipconfig"
-      Cherche "Adresse IPv4" sous ta carte réseau
-      Exemple : 192.168.1.42
-
-3b. Connecte-toi à ta box dans le navigateur :
-    → Livebox (Orange)  : http://192.168.1.1
-    → Freebox           : http://192.168.0.254
-    → SFR Box           : http://192.168.1.1
-    → Bbox (Bouygues)   : http://192.168.1.254
-    Le mot de passe est souvent sur l'étiquette sous la box.
-
-3c. Cherche la section "Redirection de ports" ou "NAT"
-    et crée ces 2 règles :
-
-    Nom           | Port ext. | Port int. | IP Destination     | Proto
-    DJ-Brain Web  | 3000      | 3000      | TON IP LOCALE      | TCP
-    DJ-Brain API  | 4000      | 4000      | TON IP LOCALE      | TCP
-
-3d. OPTIONNEL MAIS RECOMMANDÉ : Réserve l'IP de ton PC
-    pour qu'elle ne change pas si tu redémarres.
-    → Dans ta box, cherche "Bail DHCP statique" ou
-      "Réservation DHCP" et lie ton adresse MAC à cette IP.
-
-
-========================================================
-ETAPE 4 — Vérification finale
-========================================================
-
-Une fois les étapes 1, 2 et 3 faites :
-
-1. Ouvre http://localhost:3000 sur TON PC (le serveur)
-   → Si ça marche, les conteneurs tournent bien ✅
-
-2. Pour vérifier que les ports sont visibles de l'extérieur :
-   → Va sur https://canyouseeme.org depuis ton PC
-   → Tape le port 3000 et clique "Check"
-   → Si "Success" : la redirection de port fonctionne ✅
-
-3. Envoie-moi un message pour me dire si ça marche !
-
+Laisse-le tourner jusqu'à la fin (2-3 minutes).
+La fenêtre te dira quand c'est terminé.
 
 ========================================================
 EN CAS DE PROBLEME
 ========================================================
 
-Si docker-compose échoue, ouvre un terminal
-dans le dossier dj-brain et tape :
-  docker-compose logs
+Si une erreur apparaît, ne ferme PAS la fenêtre.
+Prends une photo ou copie le texte et envoie-le à Marc.
 
-Copie-moi ce que tu vois et je t'aide.
-
-Merci encore ! 🙏
 ========================================================

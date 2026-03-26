@@ -45,6 +45,10 @@ Si c'est bon, sauvegarde et ferme le bloc-notes.
 2. Navigue vers le dossier `dj-brain` :
    > cd C:\dj-brain
 3. Lance l'application avec Docker :
+   > docker compose up -d --build
+
+   ⚠️  IMPORTANT : c'est bien "docker compose" avec UN ESPACE (pas de tiret).
+   Sur les anciennes versions Docker, si ça ne marche pas, essaie :
    > docker-compose up -d --build
 
 Docker va créer la base de données, compiler le code et tout lancer d'un coup.

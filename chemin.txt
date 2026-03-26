@@ -1,0 +1,14 @@
+‪Set-ExecutionPolicy Bypass -Scope Process -Force; & "R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1"
+
+
+PS C:\WINDOWS\system32> Set-ExecutionPolicy Bypass -Scope Process -Force; & "R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1"
+Au caractère R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1:147 : 43
++ Read-Host "Appuyez sur Entree pour quitter"
++                                           ~
+Le terminateur " est manquant dans la chaîne.
+Au caractère R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1:79 : 15
++ if ($localIp) {
++               ~
+Accolade fermante « } » manquante dans le bloc d'instruction ou définition du type manquante.
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString
