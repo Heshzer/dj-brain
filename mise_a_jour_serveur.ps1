@@ -134,16 +134,22 @@ if (-not $hostAudioPath) {
     Write-Host "  Ou sont stockes les fichiers audio sur ce PC ?" -ForegroundColor Cyan
     $ftpPathInput = Read-Host "  Chemin complet (ex: R:\Partage Hanny EL SAYED\Musiques)"
     
-    # Formatage pour Docker
-    $dockerVolumePath = $ftpPathInput -replace "\\", "/"
-    $dockerVolumePath = $dockerVolumePath -replace "^([a-zA-Z]):/", "/$1/"
+    # Nettoyage des caracteres invisibles (copier-coller de Windows)
+    $cleanPath = $ftpPathInput.Trim() -replace "[^\x20-\x7E]", ""
     
-    $envContent = "HOST_AUDIO_PATH=$dockerVolumePath`n"
+    # Formatage simple pour Docker Compose (les guillemets eviteront les soucis avec les espaces)
+    $dockerVolumePath = $cleanPath -replace "\\", "/"
+    
+    $envContent = "HOST_AUDIO_PATH=""$dockerVolumePath"""
+    
+    # Écrire proprement le .env sans BOM (Byte Order Mark)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $False
     if (Test-Path $envPath) {
-        Add-Content -Path $envPath -Value "`n$envContent" -Encoding ASCII
+        [System.IO.File]::AppendAllText($envPath, "`n$envContent`n", $utf8NoBom)
     } else {
-        Set-Content -Path $envPath -Value $envContent -Encoding ASCII
+        [System.IO.File]::WriteAllText($envPath, "$envContent`n", $utf8NoBom)
     }
+    
     Write-Host "  [OK] Configuration recreee !" -ForegroundColor Green
 } else {
     Write-Host "  [OK] Chemin audio configure : $hostAudioPath" -ForegroundColor Green
