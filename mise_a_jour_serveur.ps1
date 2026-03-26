@@ -144,11 +144,12 @@ Write-Host "                RESUME FINAL                 " -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  [OK] Docker configure pour demarrer au boot" -ForegroundColor Green
-Write-Host "  [OK] Conteneurs DJ Brain relances" -ForegroundColor Green
+Write-Host "  [OK] Conteneurs DJ Brain relances (backend + BDD)" -ForegroundColor Green
 if ($localIp) {
     Write-Host "  [OK] IP locale du serveur : $localIp" -ForegroundColor Green
 }
 Write-Host ""
-Write-Host "  L'app est accessible sur : http://marcib.ddns.net:3000" -ForegroundColor Cyan
+Write-Host "  Backend API : http://marcib.ddns.net:4000" -ForegroundColor Cyan
+Write-Host "  Frontend    : sur Vercel (dj-brain.vercel.app)" -ForegroundColor Cyan
 Write-Host ""
 Read-Host "Appuyez sur Entree pour quitter"
