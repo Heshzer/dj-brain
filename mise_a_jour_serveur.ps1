@@ -118,6 +118,37 @@ try {
     Write-Host "  [ATTENTION] Mise a jour Git echouee (Git non installe ?)." -ForegroundColor DarkYellow
 }
 
+# 4.bis VERIFICATION DE LA CONFIGURATION (HOST_AUDIO_PATH)
+Write-Host ""
+Write-Host "  Verification de la configuration du chemin audio..." -ForegroundColor Yellow
+$envPath = "$composeDir\.env"
+$hostAudioPath = ""
+if (Test-Path $envPath) {
+    if ((Get-Content $envPath -Raw) -match "HOST_AUDIO_PATH=(.*)") {
+        $hostAudioPath = $matches[1].Trim()
+    }
+}
+
+if (-not $hostAudioPath) {
+    Write-Host "  [ATTENTION] La configuration du chemin des musiques a disparu !" -ForegroundColor Red
+    Write-Host "  Ou sont stockes les fichiers audio sur ce PC ?" -ForegroundColor Cyan
+    $ftpPathInput = Read-Host "  Chemin complet (ex: R:\Partage Hanny EL SAYED\Musiques)"
+    
+    # Formatage pour Docker
+    $dockerVolumePath = $ftpPathInput -replace "\\", "/"
+    $dockerVolumePath = $dockerVolumePath -replace "^([a-zA-Z]):/", "/$1/"
+    
+    $envContent = "HOST_AUDIO_PATH=$dockerVolumePath`n"
+    if (Test-Path $envPath) {
+        Add-Content -Path $envPath -Value "`n$envContent" -Encoding ASCII
+    } else {
+        Set-Content -Path $envPath -Value $envContent -Encoding ASCII
+    }
+    Write-Host "  [OK] Configuration recreee !" -ForegroundColor Green
+} else {
+    Write-Host "  [OK] Chemin audio configure : $hostAudioPath" -ForegroundColor Green
+}
+
 # 5. ARRET DES CONTENEURS
 Write-Host ""
 Write-Host "[5/6] Arret des anciens conteneurs DJ Brain..." -ForegroundColor Yellow
