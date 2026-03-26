@@ -68,8 +68,17 @@ if (Test-Path $dockerDesktopPath) {
 Write-Host ""
 Write-Host "[3/6] Detection de votre adresse IP locale..." -ForegroundColor Yellow
 $localIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
-    $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.*"
+    $_.IPAddress -notlike "127.*" -and
+    $_.IPAddress -notlike "169.*" -and
+    $_.IPAddress -notlike "172.*" -and
+    $_.PrefixOrigin -eq "Dhcp"
 } | Select-Object -First 1).IPAddress
+
+if (-not $localIp) {
+    $localIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
+        $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.*" -and $_.IPAddress -notlike "172.*"
+    } | Select-Object -First 1).IPAddress
+}
 
 if ($localIp) {
     Write-Host "  [OK] Votre IP locale est : $localIp" -ForegroundColor Green
@@ -120,14 +129,17 @@ Write-Host ""
 Write-Host "[6/6] Reconstruction et relancement (2-3 minutes)..." -ForegroundColor Yellow
 $exitCode = Invoke-DockerCompose @("up", "-d", "--build")
 
-if ($exitCode -eq 0) {
+Start-Sleep -Seconds 3
+$running = (& docker ps --filter "name=dj-brain" --format "{{.Names}}" 2>&1 | Measure-Object -Line).Lines
+if ($running -ge 2) {
     Write-Host ""
-    Write-Host "  [OK] Tous les conteneurs sont lances !" -ForegroundColor Green
+    Write-Host "  [OK] $running conteneurs DJ Brain sont en cours d'execution !" -ForegroundColor Green
     Write-Host ""
     & docker ps --format "table {{.Names}}`t{{.Status}}`t{{.Ports}}"
 } else {
     Write-Host ""
-    Write-Host "  [ERREUR] docker compose a retourne une erreur. Voir les logs ci-dessus." -ForegroundColor Red
+    Write-Host "  [ERREUR] Les conteneurs ne semblent pas tourner. Logs :" -ForegroundColor Red
+    & docker compose logs --tail=20
 }
 
 # RESUME FINAL

@@ -1,7 +1,4 @@
-‪Set-ExecutionPolicy Bypass -Scope Process -Force; & "R:\Partage Hanny EL SAYED\mise_a_jour_serveur.ps1"
-
-
-
+‪
 =============================================
      MISE A JOUR DJ BRAIN - SERVEUR v2.0
 =============================================
@@ -13,18 +10,43 @@
   [INFO] Docker Desktop non trouve au chemin standard.
 
 [3/6] Detection de votre adresse IP locale...
-  [INFO] IP non detectee. Tapez 'ipconfig' en cmd pour la trouver.
+  [OK] Votre IP locale est : 172.19.192.1
 
-[4/6] Telechargement du code depuis GitHub...
-  [ATTENTION] Mise a jour Git echouee. Verifiez manuellement.
+[4/6] Localisation du projet dj-brain...
+  [OK] Projet trouve dans : R:\Partage Hanny EL SAYED\dj-brain
+  Telechargement du code depuis GitHub...
+  [ATTENTION] Mise a jour Git echouee (Git non installe ?).
 
 [5/6] Arret des anciens conteneurs DJ Brain...
-no configuration file provided: not found
-1
+time="2026-03-26T12:30:13+01:00" level=warning msg="R:\\Partage Hanny EL SAYED\\dj-brain\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[+] down 4/4
+ ✔ Container dj-brain-frontend-1 Removed                                                                            0.5s
+ ✔ Container dj-brain-backend-1  Removed                                                                            0.5s
+ ✔ Container dj-brain-db-1       Removed                                                                            0.4s
+ ✔ Network dj-brain_default      Removed                                                                            0.3s
+0
   [OK] Conteneurs arretes.
 
 [6/6] Reconstruction et relancement (2-3 minutes)...
-no configuration file provided: not found
+time="2026-03-26T12:30:15+01:00" level=warning msg="R:\\Partage Hanny EL SAYED\\dj-brain\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image dj-brain-backend Building
+ Image dj-brain-frontend Building
+ Image dj-brain-frontend Built
+ Image dj-brain-backend Built
+ Network dj-brain_default Creating
+ Network dj-brain_default Created
+ Container dj-brain-db-1 Creating
+ Container dj-brain-db-1 Created
+ Container dj-brain-backend-1 Creating
+ Container dj-brain-backend-1 Created
+ Container dj-brain-frontend-1 Creating
+ Container dj-brain-frontend-1 Created
+ Container dj-brain-db-1 Starting
+ Container dj-brain-db-1 Started
+ Container dj-brain-backend-1 Starting
+ Container dj-brain-backend-1 Started
+ Container dj-brain-frontend-1 Starting
+ Container dj-brain-frontend-1 Started
 
   [ERREUR] docker compose a retourne une erreur. Voir les logs ci-dessus.
 
@@ -33,9 +55,11 @@ no configuration file provided: not found
 =============================================
 
   [OK] Docker configure pour demarrer au boot
-  [OK] Conteneurs DJ Brain relances
+  [OK] Conteneurs DJ Brain relances (backend + BDD)
+  [OK] IP locale du serveur : 172.19.192.1
 
-  L'app est accessible sur : http://marcib.ddns.net:3000
+  Backend API : http://marcib.ddns.net:4000
+  Frontend    : sur Vercel (dj-brain.vercel.app)
 
 
 ‪R:\Partage Hanny EL SAYED\dj-brain\docker-compose.yml
