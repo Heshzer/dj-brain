@@ -1,20 +1,16 @@
 <#
 .SYNOPSIS
 Script de mise a jour automatique DJ-Brain v2.0
-Ce script verifie Docker, recupere l'IP locale, active Docker au demarrage, et relance les conteneurs.
 #>
 
-# Ne pas fermer sur erreur - on gere nous-memes
 $ErrorActionPreference = "Continue"
 
-# Demande elevation Admin si necessaire
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Warning "Droits administrateur requis. Relancement..."
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
 
-# Fonction helper : lance docker-compose ou docker compose selon version Docker
 function Invoke-DockerCompose {
     param([string[]]$CmdArgs)
     $hasOld = $null -ne (Get-Command "docker-compose" -ErrorAction SilentlyContinue)
@@ -26,7 +22,6 @@ function Invoke-DockerCompose {
     return $LASTEXITCODE
 }
 
-# Garde-fou global : fenetre reste ouverte si crash
 trap {
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Red
@@ -73,7 +68,7 @@ if (Test-Path $dockerDesktopPath) {
 Write-Host ""
 Write-Host "[3/6] Detection de votre adresse IP locale..." -ForegroundColor Yellow
 $localIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
-    $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.*" -and $_.PrefixOrigin -eq "Dhcp"
+    $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.*"
 } | Select-Object -First 1).IPAddress
 
 if ($localIp) {
@@ -82,21 +77,10 @@ if ($localIp) {
     Write-Host "  [INFO] IP non detectee. Tapez 'ipconfig' en cmd pour la trouver." -ForegroundColor DarkYellow
 }
 
-# 4. TELECHARGEMENT DE LA DERNIERE VERSION
+# 4. LOCALISER LE PROJET ET METTRE A JOUR
 Write-Host ""
-Write-Host "[4/6] Telechargement du code depuis GitHub..." -ForegroundColor Yellow
-Set-Location $PSScriptRoot
-try {
-    & git fetch origin 2>&1 | Out-Null
-    & git reset --hard origin/main 2>&1 | Out-Null
-    Write-Host "  [OK] Code mis a jour." -ForegroundColor Green
-} catch {
-    Write-Host "  [ATTENTION] Mise a jour Git echouee. Verifiez manuellement." -ForegroundColor DarkYellow
-}
+Write-Host "[4/6] Localisation du projet dj-brain..." -ForegroundColor Yellow
 
-# Trouver le docker-compose.yml
-Write-Host ""
-Write-Host "[?] Recherche de docker-compose.yml..." -ForegroundColor Yellow
 $composeFile = $null
 if (Test-Path "$PSScriptRoot\docker-compose.yml") {
     $composeFile = "$PSScriptRoot\docker-compose.yml"
@@ -107,14 +91,23 @@ if (Test-Path "$PSScriptRoot\docker-compose.yml") {
 
 if (-not $composeFile) {
     Write-Host "  [ERREUR] docker-compose.yml introuvable !" -ForegroundColor Red
-    Write-Host "  Verifiez que le dossier dj-brain est complet." -ForegroundColor Red
+    Write-Host "  Verifiez que le dossier dj-brain est bien present." -ForegroundColor Red
     Read-Host "Appuyez sur Entree pour quitter"
     exit 1
 }
 
 $composeDir = Split-Path $composeFile
-Write-Host "  [OK] docker-compose.yml trouve dans : $composeDir" -ForegroundColor Green
+Write-Host "  [OK] Projet trouve dans : $composeDir" -ForegroundColor Green
 Set-Location $composeDir
+
+Write-Host "  Telechargement du code depuis GitHub..." -ForegroundColor Yellow
+try {
+    & git fetch origin 2>&1 | Out-Null
+    & git reset --hard origin/main 2>&1 | Out-Null
+    Write-Host "  [OK] Code mis a jour depuis GitHub." -ForegroundColor Green
+} catch {
+    Write-Host "  [ATTENTION] Mise a jour Git echouee (Git non installe ?)." -ForegroundColor DarkYellow
+}
 
 # 5. ARRET DES CONTENEURS
 Write-Host ""

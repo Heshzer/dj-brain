@@ -36,3 +36,6 @@ no configuration file provided: not found
   [OK] Conteneurs DJ Brain relances
 
   L'app est accessible sur : http://marcib.ddns.net:3000
+
+
+‪R:\Partage Hanny EL SAYED\dj-brain\docker-compose.yml
