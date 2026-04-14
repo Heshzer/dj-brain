@@ -55,11 +55,11 @@ export default function PlayerOverlay() {
       <AnimatePresence>
         {!isExpanded && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 30, opacity: 0 }}
+            exit={{ y: -20, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-4 left-4 right-4 md:left-32 md:right-32 z-40 cursor-pointer rounded-2xl overflow-hidden"
+            className="w-full cursor-pointer rounded-2xl overflow-hidden"
             style={{
               background: 'rgba(13,13,26,0.92)',
               border: '1px solid rgba(168,85,247,0.2)',

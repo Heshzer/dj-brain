@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${spaceGrotesk.className} pb-24 min-h-screen flex flex-col`} style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+      <body className={`${spaceGrotesk.className} min-h-screen flex flex-col`} style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
         <AuthProvider>
           <ClientLayout>
             {children}

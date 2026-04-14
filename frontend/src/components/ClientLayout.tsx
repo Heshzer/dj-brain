@@ -73,13 +73,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
       </header>
 
+      {/* Persistent Player */}
+      <div className="sticky top-20 z-30 w-full px-5 max-w-5xl mx-auto pt-2 pb-2">
+        <PlayerOverlay />
+      </div>
+
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-5 py-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-5 pb-8">
         {children}
       </main>
-
-      {/* Persistent Player */}
-      <PlayerOverlay />
     </AudioPlayerProvider>
   );
 }

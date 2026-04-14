@@ -9,7 +9,8 @@ from mutagen.id3 import ID3, COMM, ID3NoHeaderError
 from tkinter import filedialog, messagebox
 
 # --- CONFIGURATION ---
-API_BASE_URL = "http://localhost:4000/api"
+# Adresse de l'API de base (doit pointer vers le serveur de ton ami ou Vercel en fonction de l'endroit où tourne l'API)
+API_BASE_URL = "http://marcib.ddns.net:4000/api"
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
