@@ -3,7 +3,9 @@
 import useSWR from 'swr';
 import TrackItem from '@/components/TrackItem';
 import { Search, Disc3 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAudioPlayer } from '@/components/AudioPlayerProvider';
+import PlayerOverlay from '@/components/PlayerOverlay';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url.startsWith('http') ? url : `/api${url}`);
@@ -18,6 +20,13 @@ export default function Home() {
   const { data: tracks, error, isLoading } = useSWR('/tracks', fetcher, { refreshInterval: 5000 });
   const { data: allTags = [] } = useSWR('/tags', fetcher, { refreshInterval: 10000 });
   const [search, setSearch] = useState('');
+  const { currentTrack, loadTrack } = useAudioPlayer();
+
+  useEffect(() => {
+    if (tracks && tracks.length > 0 && !currentTrack) {
+      loadTrack(tracks[0], tracks);
+    }
+  }, [tracks, currentTrack, loadTrack]);
 
   if (error) return (
     <div className="text-center py-20" style={{ color: '#ec4899' }}>
@@ -46,6 +55,18 @@ export default function Home() {
           <p className="text-sm" style={{ color: '#3d3d6b' }}>
             {isLoading ? '...' : `${tracks?.length ?? 0} tracks`} · Tag, écoute, sync.
           </p>
+        </div>
+      </div>
+
+      {/* Large Integrated Player */}
+      <div className="mb-8 w-full">
+        <PlayerOverlay />
+      </div>
+
+      {/* Toolbar / Search */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div className="text-lg font-semibold" style={{ color: '#f1f0ff' }}>
+          File d'attente
         </div>
 
         {/* Search */}

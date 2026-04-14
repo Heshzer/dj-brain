@@ -25,6 +25,7 @@ interface AudioPlayerContextType {
   setVolume: (level: number) => void;
   playNext: () => void;
   playPrevious: () => void;
+  loadTrack: (track: Track, contextPlaylist?: Track[]) => void;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
@@ -117,6 +118,29 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     newHowl.play();
   }, [howl, volume]);
 
+  const loadTrack = useCallback((track: Track, contextPlaylist?: Track[]) => {
+    if (howl) howl.unload();
+    if (contextPlaylist) setPlaylist(contextPlaylist);
+
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+    const streamUrl = `${API_BASE}/tracks/${track.id}/stream`;
+    
+    const newHowl = new Howl({
+      src: [streamUrl],
+      format: ['mp3', 'flac', 'wav', 'aiff'],
+      html5: true,
+      volume: volume,
+      onplay: () => setIsPlaying(true),
+      onpause: () => setIsPlaying(false),
+      onend: () => setIsPlaying(false),
+      onstop: () => setIsPlaying(false),
+    });
+
+    setHowl(newHowl);
+    setCurrentTrack(track);
+    setProgress(0);
+  }, [howl, volume]);
+
   const togglePlay = () => {
     if (!howl) return;
     if (isPlaying) {
@@ -141,7 +165,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   return (
     <AudioPlayerContext.Provider value={{
       currentTrack, isPlaying, progress, volume, playlist,
-      playTrack, togglePlay, seek, setVolume, playNext, playPrevious
+      playTrack, togglePlay, seek, setVolume, playNext, playPrevious, loadTrack
     }}>
       {children}
     </AudioPlayerContext.Provider>
