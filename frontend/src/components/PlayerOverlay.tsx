@@ -10,7 +10,8 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url.startsWith('http') ? url : `/api${url}`).then(r => r.json());
 
 export default function PlayerOverlay() {
-  const { currentTrack, isPlaying, togglePlay, progress, seek, playNext, playPrevious } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, progress, duration, seek, playNext, playPrevious } = useAudioPlayer();
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tempProgress, setTempProgress] = useState(0);
 
@@ -24,7 +25,7 @@ export default function PlayerOverlay() {
 
   if (!currentTrack) return null;
 
-  const durationSec = currentTrack.duration_ms ? currentTrack.duration_ms / 1000 : 0;
+  const durationSec = duration > 0 ? duration : (currentTrack.duration_ms ? currentTrack.duration_ms / 1000 : 0);
   const currentProgress = isDragging ? tempProgress : progress;
   const progressPct = durationSec > 0 ? (currentProgress / durationSec) * 100 : 0;
 
@@ -105,22 +106,9 @@ export default function PlayerOverlay() {
         {/* Right side: Controls & Tags */}
         <div className="flex flex-col flex-1 justify-center min-w-0">
           
-          {/* Tag Editor */}
-          <div className="flex-1 overflow-y-auto mb-8 min-h-[140px] rounded-2xl p-4"
-            style={{ background: 'rgba(6,6,14,0.6)', border: '1px solid rgba(139,92,246,0.1)' }}>
-            <TagEditor
-              track={currentTrack}
-              localTags={localTags}
-              allTags={allTags}
-              onSaveTags={saveMetadata}
-              embedded={true}
-              onClose={() => {}}
-            />
-          </div>
-
           {/* Scrubber */}
-          <div className="w-full max-w-md mx-auto">
-            <div className="flex items-center gap-3 text-xs font-medium mb-6" style={{ color: '#6b6b9a' }}>
+          <div className="shrink-0 mb-6">
+            <div className="flex items-center gap-3 text-xs font-medium mb-6" style={{ color: '#3d3d6b' }}>
               <span className="w-10 text-right">{displayTime(currentProgress)}</span>
               <input
                 type="range"
@@ -131,18 +119,18 @@ export default function PlayerOverlay() {
                 onChange={e => { setIsDragging(true); setTempProgress(parseFloat(e.target.value)); }}
                 onMouseUp={e => { setIsDragging(false); seek(parseFloat((e.target as HTMLInputElement).value)); }}
                 onTouchEnd={e => { setIsDragging(false); seek(parseFloat((e.target as HTMLInputElement).value)); }}
-                className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer bg-[rgba(139,92,246,0.2)] focus:outline-none"
+                className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
                 style={{ accentColor: '#a855f7' }}
               />
               <span className="w-10">{displayTime(durationSec || 0)}</span>
             </div>
 
-            {/* Playback Controls */}
-            <div className="flex items-center justify-center gap-8">
+            {/* Controls */}
+            <div className="flex items-center justify-center gap-10">
               <button onClick={playPrevious}
-                className="p-3 rounded-full transition-all hover:bg-[rgba(139,92,246,0.1)] active:scale-90"
-                style={{ color: '#a855f7' }}>
-                <SkipBack size={24} />
+                className="p-3 rounded-full transition-all active:scale-90"
+                style={{ color: '#6b6b9a' }}>
+                <SkipBack size={26} />
               </button>
 
               <button onClick={togglePlay}
@@ -159,13 +147,27 @@ export default function PlayerOverlay() {
               </button>
 
               <button onClick={playNext}
-                className="p-3 rounded-full transition-all hover:bg-[rgba(139,92,246,0.1)] active:scale-90"
-                style={{ color: '#a855f7' }}>
-                <SkipForward size={24} />
+                className="p-3 rounded-full transition-all active:scale-90"
+                style={{ color: '#6b6b9a' }}>
+                <SkipForward size={26} />
               </button>
             </div>
           </div>
 
+          {/* Tag Editor */}
+          <div className="flex-1 overflow-y-auto mb-6 min-h-[120px]">
+            <div className="rounded-2xl p-4"
+              style={{ background: 'rgba(13,13,26,0.7)', border: '1px solid rgba(139,92,246,0.1)' }}>
+              <TagEditor
+                track={currentTrack}
+                localTags={localTags}
+                allTags={allTags}
+                onSaveTags={saveMetadata}
+                embedded={true}
+                onClose={() => {}}
+              />
+            </div>
+          </div>
         </div>
 
       </div>

@@ -17,6 +17,7 @@ interface AudioPlayerContextType {
   currentTrack: Track | null;
   isPlaying: boolean;
   progress: number;
+  duration: number;
   volume: number;
   playlist: Track[];
   playTrack: (track: Track, contextPlaylist?: Track[]) => void;
@@ -35,6 +36,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [howl, setHowl] = useState<Howl | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
   const [playlist, setPlaylist] = useState<Track[]>([]);
 
@@ -42,12 +44,18 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     let animationFrameId: number;
     
     const updateProgress = () => {
-      if (howl && isPlaying) {
+      if (howl) {
         const seek = howl.seek();
         if (typeof seek === 'number') {
           setProgress(seek);
         }
-        animationFrameId = requestAnimationFrame(updateProgress);
+        const d = howl.duration();
+        if (typeof d === 'number' && d > 0 && d !== Infinity) {
+          setDuration(d);
+        }
+        if (isPlaying) {
+          animationFrameId = requestAnimationFrame(updateProgress);
+        }
       }
     };
 
@@ -94,6 +102,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       setPlaylist(contextPlaylist);
     }
 
+    setDuration(track.duration_ms ? track.duration_ms / 1000 : 0);
+    setProgress(0);
+
     // Le streaming depuis le backend, utilisera la constante route complète si déployé avec une URL
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
     const streamUrl = `${API_BASE}/tracks/${track.id}/stream`;
@@ -103,7 +114,19 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       format: ['mp3', 'flac', 'wav', 'aiff'], // Howler is smart enough, but specify default
       html5: true, // IMPORTANT FOR STREAMING LARGE FILES GAPLESSLY
       volume: volume,
-      onplay: () => setIsPlaying(true),
+      onplay: () => {
+        setIsPlaying(true);
+        const d = newHowl.duration();
+        if (typeof d === 'number' && d > 0 && d !== Infinity) {
+          setDuration(d);
+        }
+      },
+      onload: () => {
+        const d = newHowl.duration();
+        if (typeof d === 'number' && d > 0 && d !== Infinity) {
+          setDuration(d);
+        }
+      },
       onpause: () => setIsPlaying(false),
       onend: () => {
         setIsPlaying(false);
@@ -122,6 +145,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (howl) howl.unload();
     if (contextPlaylist) setPlaylist(contextPlaylist);
 
+    setDuration(track.duration_ms ? track.duration_ms / 1000 : 0);
+    setProgress(0);
+
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
     const streamUrl = `${API_BASE}/tracks/${track.id}/stream`;
     
@@ -130,7 +156,19 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       format: ['mp3', 'flac', 'wav', 'aiff'],
       html5: true,
       volume: volume,
-      onplay: () => setIsPlaying(true),
+      onplay: () => {
+        setIsPlaying(true);
+        const d = newHowl.duration();
+        if (typeof d === 'number' && d > 0 && d !== Infinity) {
+          setDuration(d);
+        }
+      },
+      onload: () => {
+        const d = newHowl.duration();
+        if (typeof d === 'number' && d > 0 && d !== Infinity) {
+          setDuration(d);
+        }
+      },
       onpause: () => setIsPlaying(false),
       onend: () => setIsPlaying(false),
       onstop: () => setIsPlaying(false),
@@ -138,7 +176,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
     setHowl(newHowl);
     setCurrentTrack(track);
-    setProgress(0);
   }, [howl, volume]);
 
   const togglePlay = () => {
@@ -164,7 +201,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   return (
     <AudioPlayerContext.Provider value={{
-      currentTrack, isPlaying, progress, volume, playlist,
+      currentTrack, isPlaying, progress, duration, volume, playlist,
       playTrack, togglePlay, seek, setVolume, playNext, playPrevious, loadTrack
     }}>
       {children}
