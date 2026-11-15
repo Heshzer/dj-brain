@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="theme-color" content="#f6f3ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Bibliothèque" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <title>Ma Bibliothèque — Studio Audio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── PALETTE APPLE PASTEL & COSMIC IRIDESCENT ─── */
+    :root {
+      --bg-base: #f5f2fc;
+      --bg-gradient-1: #ffe3ec;
+      --bg-gradient-2: #e4dcff;
+      --bg-gradient-3: #d5f3fe;
+      --bg-gradient-4: #dff9ee;
+
+      --glass-surface: rgba(255, 255, 255, 0.62);
+      --glass-elevated: rgba(255, 255, 255, 0.84);
+      --glass-dock: rgba(255, 255, 255, 0.76);
+      --glass-border: rgba(255, 255, 255, 0.88);
+      --glass-border-subtle: rgba(145, 130, 190, 0.16);
+      --glass-shadow: 0 12px 36px -8px rgba(70, 55, 120, 0.08), 0 2px 6px rgba(70, 55, 120, 0.04);
+      --glass-shadow-hover: 0 20px 44px -10px rgba(95, 70, 165, 0.15), 0 4px 12px rgba(95, 70, 165, 0.06);
+
+      --text-primary: #181528;
+      --text-secondary: #655e7a;
+      --text-muted: #9890ad;
+
+      --pastel-lavender: #c8b6ff;
+      --pastel-rose: #ffafcc;
+      --pastel-sky: #a2d2ff;
+      --pastel-mint: #b8f2e6;
+      --pastel-peach: #ffd6a5;
+      --accent-primary: #6c47ff;
+      --accent-gradient: linear-gradient(135deg, #8b6dff 0%, #ff7eb3 55%, #ffaa85 100%);
+      --btn-dark: #181528;
+      --btn-dark-text: #ffffff;
+
+      --flare-opacity: 0.85;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Mode "Cosmic Night Pastel" (Nuit étoilée pastel) */
+    body.cosmic-night {
+      --bg-base: #0d0b18;
+      --bg-gradient-1: rgba(255, 145, 195, 0.22);
+      --bg-gradient-2: rgba(165, 135, 255, 0.25);
+      --bg-gradient-3: rgba(110, 205, 255, 0.20);
+      --bg-gradient-4: rgba(130, 245, 210, 0.16);
+
+      --glass-surface: rgba(26, 23, 44, 0.56);
+      --glass-elevated: rgba(38, 33, 64, 0.74);
+      --glass-dock: rgba(24, 20, 42, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-border-subtle: rgba(200, 185, 255, 0.12);
+      --glass-shadow: 0 14px 40px -8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      --glass-shadow-hover: 0 22px 50px -10px rgba(140, 105, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+      --text-primary: #f7f5ff;
+      --text-secondary: #b3abc9;
+      --text-muted: #776f92;
+      --btn-dark: #f7f5ff;
+      --btn-dark-text: #141124;
+      --flare-opacity: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'SF Pro Display', sans-serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.6s var(--spring), color 0.4s ease;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── ARRIÈRE-PLAN COSMIQUE PASTEL : NÉBULEUSES, LENS FLARES & CANVAS PARTICULES ─── */
+    .cosmos-stage {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* Sphères de nébuleuses pastel flottantes */
+    .nebula-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(85px);
+      opacity: 0.78;
+      will-change: transform;
+      animation: floatNebula 22s ease-in-out infinite alternate;
+    }
+    .nebula-1 {
+      width: 55vw;
+      height: 55vw;
+      max-width: 680px;
+      max-height: 680px;
+      top: -12%;
+      left: -8%;
+      background: radial-gradient(circle, var(--bg-gradient-1) 0%, transparent 70%);
+    }
+    .nebula-2 {
+      width: 60vw;
+      height: 60vw;
+      max-width: 760px;
+      max-height: 760px;
+      top: 15%;
+      right: -15%;
+      background: radial-gradient(circle, var(--bg-gradient-2) 0%, transparent 70%);
+      animation-delay: -7s;
+      animation-duration: 26s;
+    }
+    .nebula-3 {
+      width: 50vw;
+      height: 50vw;
+      max-width: 640px;
+      max-height: 640px;
+      bottom: -10%;
+      left: 12%;
+      background: radial-gradient(circle, var(--bg-gradient-3) 0%, transparent 70%);
+      animation-delay: -13s;
+      animation-duration: 29s;
+    }
+    .nebula-4 {
+      width: 42vw;
+      height: 42vw;
+      max-width: 520px;
+      max-height: 520px;
+      bottom: 20%;
+      right: 18%;
+      background: radial-gradient(circle, var(--bg-gradient-4) 0%, transparent 70%);
+      animation-delay: -4s;
+    }
+
+    @keyframes floatNebula {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(35px, -25px, 0) scale(1.08); }
+      100% { transform: translate3d(-25px, 30px, 0) scale(0.95); }
+    }
+
+    /* Optical Lens Flares (Flares anamorphiques & halos irisés) */
+    .optical-flare-main {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      width: 820px;
+      height: 320px;
+      transform: translateX(-50%) rotate(-8deg);
+      background:
+        radial-gradient(ellipse 35% 18% at 50% 50%, rgba(255, 255, 255, 0.75), rgba(255, 195, 230, 0.32) 45%, transparent 75%),
+        radial-gradient(circle 90px at 50% 50%, rgba(190, 165, 255, 0.45), transparent 70%);
+      opacity: var(--flare-opacity);
+      mix-blend-mode: screen;
+      filter: blur(8px);
+      animation: pulseFlare 8s ease-in-out infinite alternate;
+    }
+
+    /* Rayon horizontal anamorphique (Lens streak) */
+    .anamorphic-streak {
+      position: absolute;
+      top: 18%;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(162, 210, 255, 0.4) 20%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(255, 175, 204, 0.45) 80%,
+        transparent 100%
+      );
+      box-shadow: 0 0 24px 3px rgba(200, 182, 255, 0.65), 0 0 60px 10px rgba(255, 175, 204, 0.35);
+      opacity: 0.75;
+      transform: rotate(-4deg);
+      animation: streakShimmer 11s ease-in-out infinite alternate;
+    }
+
+    /* Anneau iris (Halo de lentille) */
+    .lens-iris-ring {
+      position: absolute;
+      top: 22%;
+      left: 62%;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      background: radial-gradient(circle, transparent 58%, rgba(255, 185, 220, 0.18) 66%, rgba(165, 215, 255, 0.22) 72%, transparent 78%);
+      filter: blur(1px);
+      opacity: 0.65;
+      animation: ringDrift 16s ease-in-out infinite alternate;
+    }
+
+    .lens-ghost-orb {
+      position: absolute;
+      top: 32%;
+      left: 28%;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184, 242, 230, 0.55) 0%, rgba(200, 182, 255, 0.25) 60%, transparent 75%);
+      filter: blur(3px);
+      animation: ringDrift 12s ease-in-out infinite alternate-reverse;
+    }
+
+    body.is-playing .optical-flare-main {
+      animation-duration: 3.2s;
+      filter: blur(5px) brightness(1.12);
+    }
+    body.is-playing .anamorphic-streak {
+      opacity: 0.95;
+      box-shadow: 0 0 32px 5px rgba(200, 182, 255, 0.85), 0 0 80px 16px rgba(255, 175, 204, 0.5);
+    }
+
+    @keyframes pulseFlare {
+      0% { transform: translateX(-50%) rotate(-8deg) scale(0.94); opacity: 0.65; }
+      100% { transform: translateX(-48%) rotate(-5deg) scale(1.08); opacity: 0.95; }
+    }
+    @keyframes streakShimmer {
+      0% { transform: rotate(-4deg) scaleX(0.88) translateY(0); opacity: 0.55; }
+      100% { transform: rotate(-3deg) scaleX(1.06) translateY(-8px); opacity: 0.9; }
+    }
+    @keyframes ringDrift {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(-30px, 18px, 0) scale(1.12); }
+    }
+
+    /* Canvas des particules spatiales, étoiles & sparkles */
+    #cosmosCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ─── CONTENEUR PRINCIPAL ─── */
+    .app-shell {
+      position: relative;
+      z-index: 2;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: calc(24px + var(--safe-top)) 20px calc(220px + var(--safe-bottom));
+    }
+
+    /* ─── HEADER MINIMALISTE APPLE ─── */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Icône Orbe Pastel Irisée avec mini-flare */
+    .brand-orb {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ffe0ec 0%, #ddd2ff 50%, #c9f2ee 100%);
+      box-shadow:
+        0 8px 24px -4px rgba(130, 100, 220, 0.28),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.35s var(--bounce);
+    }
+    .brand-orb:hover {
+      transform: scale(1.06) rotate(-3deg);
+    }
+    .brand-orb::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 55%);
+      pointer-events: none;
+    }
+
+    .brand-bars {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+    }
+    .brand-bars span {
+      display: block;
+      width: 3.2px;
+      border-radius: 99px;
+      background: #231d38;
+      transition: height 0.25s var(--spring);
+    }
+    .brand-bars span:nth-child(1) { height: 8px; }
+    .brand-bars span:nth-child(2) { height: 16px; }
+    .brand-bars span:nth-child(3) { height: 11px; }
+    .brand-bars span:nth-child(4) { height: 19px; }
+    .brand-bars span:nth-child(5) { height: 9px; }
+
+    body.is-playing .brand-bars span:nth-child(1) { animation: eqBounce 0.65s infinite alternate; }
+    body.is-playing .brand-bars span:nth-child(2) { animation: eqBounce 0.45s infinite alternate-reverse; }
+    body.is-playing .brand-bars span:nth-child(3) { animation: eqBounce 0.55s infinite alternate; }
+    body.is-playing .brand-bars span:nth-child(4) { animation: eqBounce 0.5s infinite alternate-reverse; }
+    body.is-playing .brand-bars span:nth-child(5) { animation: eqBounce 0.6s infinite alternate; }
+
+    @keyframes eqBounce {
+      0% { height: 5px; }
+      100% { height: 20px; }
+    }
+
+    .brand-title {
+      font-size: 1.32rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text-primary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 12px #34d399;
+      display: inline-block;
+    }
+    .status-dot.offline {
+      background: #fb7185;
+      box-shadow: 0 0 12px #fb7185;
+    }
+
+    .brand-subtitle {
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: -0.005em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-glass {
+      position: relative;
+      background: var(--glass-surface);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 999px;
+      padding: 9px 15px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s var(--spring);
+      overflow: hidden;
+    }
+    .btn-glass:hover {
+      background: var(--glass-elevated);
+      transform: translateY(-1.5px);
+      box-shadow: var(--glass-shadow-hover);
+    }
+    .btn-glass:active {
+      transform: scale(0.95);
+    }
+    .btn-glass.icon-only {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      justify-content: center;
+    }
+    .btn-glass.spinning svg {
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── CAPSULE RÉSUMÉ (STATS PILL) ─── */
+    .stats-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 20px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Petit reflet spéculaire qui traverse la barre de stats */
+    .stats-strip::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      transform: skewX(-25deg);
+      animation: sheenSweep 9s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes sheenSweep {
+      0%, 65% { left: -60%; }
+      100% { left: 130%; }
+    }
+
+    .stats-items {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-pill strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .ftp-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #6b46c1;
+      background: linear-gradient(135deg, rgba(232, 220, 255, 0.9), rgba(255, 224, 238, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 4px 11px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 10px rgba(140, 100, 255, 0.12);
+    }
+
+    /* ─── NAVIGATION PAR DOSSIERS (SEGMENTED PASTEL PILLS) ─── */
+    .folders-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 10px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .folders-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .folder-tab {
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: var(--text-secondary);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 14px rgba(70, 55, 120, 0.04);
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.28s var(--bounce);
+      flex-shrink: 0;
+    }
+    .folder-tab:hover {
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      background: var(--glass-elevated);
+    }
+    .folder-tab.active {
+      background: var(--btn-dark);
+      color: var(--btn-dark-text);
+      border-color: transparent;
+      box-shadow: 0 10px 24px -4px rgba(30, 22, 56, 0.26);
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    .folder-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .folder-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 1.5px 7px;
+      border-radius: 99px;
+      background: rgba(130, 120, 160, 0.12);
+      color: inherit;
+    }
+    .folder-tab.active .folder-count {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    body.cosmic-night .folder-tab.active .folder-count {
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    /* ─── RECHERCHE & FILTRES (VERRE DÉPOLI) ─── */
+    .controls-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 680px) {
+      .controls-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .search-box {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-box svg {
+      position: absolute;
+      left: 15px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--glass-surface);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 16px;
+      padding: 11px 38px 11px 42px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.25s var(--spring);
+    }
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+    .search-input:focus {
+      background: var(--glass-elevated);
+      border-color: #b79ced;
+      box-shadow: 0 0 0 4px rgba(183, 156, 237, 0.22), var(--glass-shadow);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: none;
+      padding: 4px;
+    }
+
+    .select-control {
+      background: var(--glass-surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 16px;
+      padding: 11px 15px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s var(--spring);
+    }
+    .select-control:hover {
+      background: var(--glass-elevated);
+    }
+
+    /* ─── CARTES DE MORCEAUX APPLE GLASS & POCHETTES PASTEL ─── */
+    .tracks-container {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .track-card {
+      position: relative;
+      background: var(--glass-surface);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 20px;
+      padding: 11px 15px;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.28s var(--spring), box-shadow 0.28s var(--spring), background 0.25s ease, border-color 0.25s ease;
+    }
+
+    /* Reflet glissant au survol */
+    .track-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.65s var(--spring);
+      pointer-events: none;
+    }
+    .track-card:hover::after {
+      left: 125%;
+    }
+
+    .track-card:hover {
+      background: var(--glass-elevated);
+      transform: translateY(-2px) scale(1.003);
+      box-shadow: var(--glass-shadow-hover);
+    }
+    .track-card:active {
+      transform: scale(0.992);
+    }
+
+    .track-card.playing {
+      background: var(--glass-elevated);
+      border-color: rgba(168, 130, 255, 0.65);
+      box-shadow:
+        0 16px 40px -8px rgba(145, 105, 255, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+    }
+
+    /* Pochette Pastel Générative (Squircle Apple Music) */
+    .track-art {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1d1830;
+      box-shadow:
+        0 6px 16px -3px rgba(60, 45, 110, 0.16),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.9);
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.35s var(--bounce);
+    }
+    .track-card:hover .track-art {
+      transform: scale(1.06) rotate(-2deg);
+    }
+
+    /* Mini flare sur la pochette */
+    .track-art::before {
+      content: "";
+      position: absolute;
+      top: -30%;
+      left: -30%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .track-art-play {
+      position: relative;
+      z-index: 1;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.25s var(--bounce), background 0.2s ease;
+    }
+    .track-card:hover .track-art-play {
+      transform: scale(1.1);
+      background: #ffffff;
+    }
+    .track-card.playing .track-art-play {
+      background: #181528;
+      color: #ffffff;
+    }
+
+    .track-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .track-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .track-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-card.playing .track-title {
+      background: linear-gradient(90deg, #6c47ff, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.cosmic-night .track-card.playing .track-title {
+      background: linear-gradient(90deg, #c4b5fd, #f9a8d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .track-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      color: var(--text-secondary);
+    }
+
+    /* Pastilles Pastel Douces */
+    .badge {
+      padding: 2.5px 8px;
+      border-radius: 999px;
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-folder {
+      background: rgba(145, 130, 190, 0.12);
+      color: var(--text-primary);
+    }
+
+    .badge-format {
+      background: rgba(167, 243, 208, 0.55);
+      color: #065f46;
+      border: 1px solid rgba(110, 231, 183, 0.5);
+    }
+    .badge-format.lossless {
+      background: rgba(254, 215, 170, 0.65);
+      color: #9a3412;
+      border: 1px solid rgba(253, 186, 116, 0.6);
+    }
+    body.cosmic-night .badge-format {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    body.cosmic-night .badge-format.lossless {
+      background: rgba(251, 146, 60, 0.18);
+      color: #fdba74;
+      border-color: rgba(251, 146, 60, 0.3);
+    }
+
+    .badge-bpm {
+      background: rgba(186, 230, 253, 0.6);
+      color: #0369a1;
+      border: 1px solid rgba(125, 211, 252, 0.5);
+    }
+    body.cosmic-night .badge-bpm {
+      background: rgba(56, 189, 248, 0.16);
+      color: #7dd3fc;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-key {
+      background: rgba(233, 213, 255, 0.65);
+      color: #6b21a8;
+      border: 1px solid rgba(216, 180, 254, 0.55);
+    }
+    body.cosmic-night .badge-key {
+      background: rgba(192, 132, 252, 0.18);
+      color: #d8b4fe;
+      border-color: rgba(192, 132, 252, 0.3);
+    }
+
+    .badge-notes {
+      background: rgba(254, 205, 211, 0.65);
+      color: #9f1239;
+    }
+    body.cosmic-night .badge-notes {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fda4af;
+    }
+
+    .meta-sep {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .track-duration {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-right: 6px;
+      min-width: 42px;
+      text-align: right;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.22s var(--bounce);
+      text-decoration: none;
+    }
+    .icon-btn:hover {
+      background: rgba(145, 130, 190, 0.14);
+      color: var(--text-primary);
+      transform: scale(1.12);
+    }
+    .icon-btn.fav-active {
+      color: #f59e0b;
+      filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));
+    }
+
+    @media (max-width: 560px) {
+      .track-card {
+        padding: 10px 12px;
+        gap: 11px;
+        border-radius: 18px;
+      }
+      .track-duration {
+        display: none;
+      }
+    }
+
+    /* ─── ÉTAT VIDE ─── */
+    .empty-state {
+      background: var(--glass-surface);
+      backdrop-filter: blur(24px);
+      border: 1px dashed var(--glass-border-subtle);
+      border-radius: 24px;
+      padding: 48px 22px;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .empty-state h3 {
+      font-size: 1.08rem;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      max-width: 460px;
+      margin: 0 auto 14px;
+      line-height: 1.5;
+    }
+    .code-snippet {
+      display: inline-block;
+      background: rgba(145, 130, 190, 0.12);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    /* ─── DOCK LECTEUR FLOTTANT (APPLE DYNAMIC ISLAND / GLASS PILL) ─── */
+    .player-dock-wrapper {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      padding: 0 14px calc(12px + var(--safe-bottom));
+      pointer-events: none;
+    }
+
+    .player-dock {
+      pointer-events: auto;
+      position: relative;
+      max-width: 1012px;
+      margin: 0 auto;
+      background: var(--glass-dock);
+      backdrop-filter: blur(36px) saturate(210%);
+      -webkit-backdrop-filter: blur(36px) saturate(210%);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 13px 20px 15px;
+      box-shadow:
+        0 24px 60px -12px rgba(45, 30, 95, 0.18),
+        0 4px 16px rgba(45, 30, 95, 0.06),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.92);
+      overflow: hidden;
+      transition: box-shadow 0.4s ease, transform 0.3s var(--spring);
+    }
+    body.cosmic-night .player-dock {
+      box-shadow:
+        0 24px 60px -10px rgba(0, 0, 0, 0.65),
+        0 0 40px -10px rgba(165, 130, 255, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* Lueur flare interne en haut du lecteur */
+    .player-dock::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 15%;
+      right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 175, 204, 0.85), rgba(162, 210, 255, 0.9), transparent);
+      filter: blur(0.5px);
+      pointer-events: none;
+    }
+
+    /* Halo pastel doux sous la waveform quand un son tourne */
+    .player-dock::after {
+      content: "";
+      position: absolute;
+      bottom: -40px;
+      left: 25%;
+      right: 25%;
+      height: 80px;
+      background: radial-gradient(ellipse at center, rgba(195, 160, 255, 0.35), rgba(255, 175, 210, 0.2), transparent 70%);
+      filter: blur(22px);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+    body.is-playing .player-dock::after {
+      opacity: 1;
+    }
+
+    .player-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* Waveform / Scrubber row */
+    .waveform-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .time-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 38px;
+      user-select: none;
+    }
+    .time-label.right {
+      text-align: right;
+    }
+
+    .waveform-scrubber {
+      position: relative;
+      flex: 1;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .waveform-bars {
+      width: 100%;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2.5px;
+    }
+
+    .wf-bar {
+      flex: 1;
+      background: rgba(145, 130, 190, 0.24);
+      border-radius: 99px;
+      min-height: 4px;
+      transition: background 0.15s ease, transform 0.2s var(--spring);
+    }
+    .wf-bar.played {
+      background: linear-gradient(180deg, #7c5cff 0%, #f472b6 100%);
+      box-shadow: 0 0 8px rgba(168, 120, 255, 0.35);
+    }
+    .waveform-scrubber:hover .wf-bar.played {
+      transform: scaleY(1.08);
+    }
+
+    /* Marqueurs de notes sur la waveform */
+    .wf-markers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .wf-note-pin {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      width: 3px;
+      border-radius: 99px;
+      background: #fb7185;
+      box-shadow: 0 0 8px #fb7185;
+    }
+
+    /* Grille contrôles du lecteur */
+    .player-controls-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1.2fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    @media (max-width: 780px) {
+      .player-controls-grid {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      .player-right-tools {
+        grid-column: 1 / -1;
+        justify-content: space-between;
+        padding-top: 6px;
+        border-top: 1px solid var(--glass-border-subtle);
+      }
+    }
+
+    .now-playing-info {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .np-badge-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #ffe5ec 0%, #e2d6ff 55%, #d0f4ea 100%);
+      color: #1e1736;
+      box-shadow: 0 4px 12px rgba(120, 95, 200, 0.18), inset 0 1px 1px rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.66rem;
+      font-weight: 800;
+    }
+
+    .np-text {
+      min-width: 0;
+    }
+
+    .np-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .np-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Boutons Transport Apple */
+    .transport-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .transport-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.22s var(--bounce);
+    }
+    .transport-btn:hover {
+      background: rgba(145, 130, 190, 0.14);
+      transform: scale(1.08);
+    }
+    .transport-btn:active {
+      transform: scale(0.92);
+    }
+    .transport-btn.active {
+      background: rgba(140, 100, 255, 0.16);
+      color: #7c3aed;
+      border-color: rgba(140, 100, 255, 0.3);
+    }
+    body.cosmic-night .transport-btn.active {
+      color: #c4b5fd;
+    }
+
+    .transport-play-main {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--btn-dark);
+      color: var(--btn-dark-text);
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 24px -4px rgba(30, 20, 60, 0.32);
+      transition: transform 0.25s var(--bounce), box-shadow 0.25s ease;
+    }
+    .transport-play-main:hover {
+      transform: scale(1.07);
+      box-shadow: 0 14px 28px -4px rgba(110, 75, 240, 0.38);
+    }
+    .transport-play-main:active {
+      transform: scale(0.91);
+    }
+
+    /* Outils Studio à droite */
+    .player-right-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .studio-pill-btn {
+      background: rgba(145, 130, 190, 0.11);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.22s var(--bounce);
+    }
+    .studio-pill-btn:hover {
+      background: rgba(145, 130, 190, 0.2);
+      transform: translateY(-1px);
+    }
+    .studio-pill-btn.active {
+      background: linear-gradient(135deg, rgba(233, 213, 255, 0.85), rgba(254, 205, 211, 0.85));
+      color: #4c1d95;
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .volume-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .volume-slider {
+      width: 68px;
+      accent-color: #7c5cff;
+      cursor: pointer;
+    }
+    @media (max-width: 640px) {
+      .volume-box {
+        display: none;
+      }
+    }
+
+    /* ─── TIROIR NOTES STUDIO (GLASS SHEET) ─── */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 16, 36, 0.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 80;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .drawer-backdrop.open {
+      display: flex;
+    }
+
+    .drawer-sheet {
+      width: 100%;
+      max-width: 580px;
+      background: var(--glass-elevated);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border: 1px solid var(--glass-border);
+      border-bottom: none;
+      border-radius: 28px 28px 0 0;
+      padding: 22px 22px calc(26px + var(--safe-bottom));
+      max-height: 82dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 -20px 60px rgba(30, 20, 60, 0.18);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-header h3 {
+      font-size: 1.02rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: 280px;
+    }
+
+    .note-item {
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .note-time-chip {
+      background: rgba(233, 213, 255, 0.7);
+      color: #5b21b6;
+      border-radius: 99px;
+      padding: 3px 9px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .note-text {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    .note-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .note-input {
+      flex: 1;
+      background: var(--glass-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    .btn-primary-pill {
+      background: var(--btn-dark);
+      color: var(--btn-dark-text);
+      border: none;
+      border-radius: 14px;
+      padding: 11px 18px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.2s var(--bounce);
+    }
+    .btn-primary-pill:active {
+      transform: scale(0.95);
+    }
+
+    /* ─── TOAST NOTIFICATION APPLE PILL ─── */
+    .toast {
+      position: fixed;
+      top: calc(20px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-90px) scale(0.9);
+      background: var(--btn-dark);
+      color: var(--btn-dark-text);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      z-index: 120;
+      box-shadow: 0 14px 35px rgba(30, 20, 65, 0.25);
+      transition: transform 0.35s var(--bounce);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* ─── MODAL PIN AUTH ─── */
+    .pin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 242, 252, 0.8);
+      backdrop-filter: blur(24px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .pin-modal.open {
+      display: flex;
+    }
+    .pin-box {
+      background: var(--glass-elevated);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow-hover);
+      border-radius: 28px;
+      padding: 32px 26px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scène Spatiale Pastel : Nébuleuses, Optical Lens Flares, Particules & Spares/Sparkles -->
+  <div class="cosmos-stage" aria-hidden="true">
+    <div class="nebula-blob nebula-1"></div>
+    <div class="nebula-blob nebula-2"></div>
+    <div class="nebula-blob nebula-3"></div>
+    <div class="nebula-blob nebula-4"></div>
+    <div class="optical-flare-main"></div>
+    <div class="anamorphic-streak"></div>
+    <div class="lens-iris-ring"></div>
+    <div class="lens-ghost-orb"></div>
+    <canvas id="cosmosCanvas"></canvas>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast">Copié !</div>
+
+  <!-- Écran Code PIN (uniquement si ACCESS_PIN est défini dans .env) -->
+  <div id="pinModal" class="pin-modal">
+    <div class="pin-box">
+      <div class="brand-orb" style="margin: 0 auto;">
+        <div class="brand-bars"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <h2>Ma Bibliothèque</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">Entre le code d'accès pour ouvrir ton espace musical.</p>
+      <form id="pinForm" style="display:flex; flex-direction:column; gap:10px;">
+        <input id="pinInput" type="password" class="note-input mono" placeholder="Code d'accès..." style="text-align:center; font-size:1.1rem;" required />
+        <button type="submit" class="btn-primary-pill">Déverrouiller</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenu Principal -->
+  <div class="app-shell">
+    <header class="top-header">
+      <div class="brand-group">
+        <div class="brand-orb" id="brandOrb" title="Cliquer pour faire jaillir des étoiles">
+          <div class="brand-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span id="artistTitle">Ma Bibliothèque</span>
+            <span id="statusDot" class="status-dot" title="Connecté au serveur"></span>
+          </div>
+          <div class="brand-subtitle" id="folderSubtitle">Synchronisation directe FileZilla</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="phoneConnectBtn" class="btn-glass" title="Ouvrir sur mon iPhone (QR Code)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Sur mon Tel</span>
+        </button>
+        <button id="themeToggleBtn" class="btn-glass icon-only" title="Basculer entre Pastel Jour et Nuit Étoilée Pastel">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button id="shareFolderBtn" class="btn-glass" title="Partager ce dossier ou la bibliothèque">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Partager</span>
+        </button>
+        <button id="syncBtn" class="btn-glass" title="Actualiser les fichiers déposés sur FileZilla">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          <span>Sync</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bandeau Statistiques Verre Dépoli -->
+    <div class="stats-strip">
+      <div class="stats-items">
+        <span class="stat-pill"><strong id="statCount">0</strong> morceaux</span>
+        <span class="stat-pill"><strong id="statDuration">0m</strong> d'écoute</span>
+        <span class="stat-pill"><strong id="statSize">0 Mo</strong> stockés</span>
+      </div>
+      <span class="ftp-badge">✦ Auto-Sync FileZilla</span>
+    </div>
+
+    <!-- Onglets Dossiers FileZilla -->
+    <nav id="foldersBar" class="folders-bar" aria-label="Dossiers"></nav>
+
+    <!-- Recherche, Filtre Format & Tri -->
+    <div class="controls-row">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="search" class="search-input" placeholder="Rechercher un titre, dossier, BPM (140), tonalité (Cm)..." autocomplete="off" />
+        <button id="searchClear" class="search-clear" title="Effacer">&times;</button>
+      </div>
+
+      <select id="formatFilter" class="select-control" aria-label="Filtrer par format">
+        <option value="ALL">Tous formats</option>
+      </select>
+
+      <select id="sortSelect" class="select-control" aria-label="Trier par">
+        <option value="recent">Plus récents</option>
+        <option value="oldest">Plus anciens</option>
+        <option value="name">Nom (A → Z)</option>
+        <option value="bpm">BPM</option>
+        <option value="duration">Durée</option>
+        <option value="size">Taille fichier</option>
+      </select>
+    </div>
+
+    <!-- Liste des morceaux -->
+    <main id="tracksList" class="tracks-container"></main>
+    <div id="loadMoreWrap" style="text-align:center; margin-top:16px; display:none;">
+      <button id="loadMoreBtn" class="btn-glass" style="padding:11px 24px;">Afficher plus de sons</button>
+    </div>
+  </div>
+
+  <!-- Modal Connexion Téléphone (QR Code + Liens Directs) -->
+  <div id="phoneDrawer" class="drawer-backdrop">
+    <div class="drawer-sheet" style="align-items:center; text-align:center;">
+      <div class="drawer-header" style="width:100%;">
+        <h3>📱 Tester sur mon iPhone</h3>
+        <button id="closePhoneBtn" class="icon-btn">&times;</button>
+      </div>
+      <p style="font-size:0.83rem; color:var(--text-secondary); max-width:420px;">
+        Scanne ce QR Code avec l'appareil photo de ton iPhone pour ouvrir directement toute ta bibliothèque <strong>FL GANG</strong> :
+      </p>
+      <div style="background:#fff; padding:14px; border-radius:22px; box-shadow:0 12px 30px rgba(70,55,120,0.12); display:inline-block;">
+        <img id="qrImage" src="" alt="QR Code Mobile" width="190" height="190" style="display:block; border-radius:10px;" />
+      </div>
+      <div id="phoneLinksBox" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- Tiroir Notes Studio Horodatées -->
+  <div id="notesDrawer" class="drawer-backdrop">
+    <div class="drawer-sheet">
+      <div class="drawer-header">
+        <h3>
+          <span>✦ Notes d'écoute — <span id="notesTrackTitle" style="color:#7c3aed;">Morceau</span></span>
+        </h3>
+        <button id="closeNotesBtn" class="icon-btn">&times;</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-secondary);">
+        Note une idée de mix ou d'arrangement à la seconde près. Clique sur un minutage pour y aller directement.
+      </p>
+      <div id="notesList" class="notes-list"></div>
+      <form id="noteForm" class="note-form">
+        <input id="noteInput" type="text" class="note-input" placeholder="Ex: Adoucir la reverb à l'entrée du refrain..." maxlength="250" required />
+        <button type="submit" class="btn-primary-pill mono" id="noteSubmitBtn">+ 00:00</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lecteur Audio Flottant Façon Apple Dynamic Island -->
+  <div class="player-dock-wrapper">
+    <footer class="player-dock">
+      <div class="player-inner">
+        <!-- Timeline Waveform Interactive -->
+        <div class="waveform-row">
+          <span id="timeCurrent" class="time-label mono">00:00</span>
+          <div id="waveformScrubber" class="waveform-scrubber" title="Glisser pour avancer ou reculer dans le morceau">
+            <div id="waveformBars" class="waveform-bars"></div>
+            <div id="waveformMarkers" class="wf-markers"></div>
+          </div>
+          <span id="timeTotal" class="time-label right mono">00:00</span>
+        </div>
+
+        <!-- Contrôles Principaux -->
+        <div class="player-controls-grid">
+          <div class="now-playing-info">
+            <div id="npFormatBox" class="np-badge-box mono">✦</div>
+            <div class="np-text">
+              <div id="npTitle" class="np-title">Sélectionne un morceau</div>
+              <div id="npSub" class="np-sub">Prêt à jouer • Bibliothèque synchronisée</div>
+            </div>
+          </div>
+
+          <div class="transport-group">
+            <button id="shuffleBtn" class="transport-btn" title="Lecture aléatoire">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+            </button>
+            <button id="prevBtn" class="transport-btn" title="Précédent">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button id="seekBackBtn" class="transport-btn mono" style="font-size:0.68rem; font-weight:700;" title="Reculer de 10 secondes">-10s</button>
+            <button id="playPauseBtn" class="transport-play-main" title="Lecture / Pause (Espace)">
+              <svg id="playIcon" width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button id="seekFwdBtn" class="transport-btn mono" style="font-size:0.68rem; font-weight:700;" title="Avancer de 10 secondes">+10s</button>
+            <button id="nextBtn" class="transport-btn" title="Suivant">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+            <button id="loopBtn" class="transport-btn" title="Boucle (1 morceau / Tout)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+          </div>
+
+          <div class="player-right-tools">
+            <button id="speedBtn" class="studio-pill-btn mono" title="Tester en Slowed ou Sped Up">
+              <span>1.00x</span>
+            </button>
+            <button id="openNotesBtn" class="studio-pill-btn" title="Notes horodatées sur ce morceau">
+              <span>✦</span>
+              <span id="npNotesCount">Notes (0)</span>
+            </button>
+            <div class="volume-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <input id="volumeSlider" type="range" class="volume-slider" min="0" max="1" step="0.02" value="1" />
+            </div>
+            <a id="npDownloadBtn" class="studio-pill-btn" href="#" download title="Télécharger le fichier audio" style="text-decoration:none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>DL</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Élément Audio HTML5 natif (100% compatible iPhone Safari en arrière-plan) -->
+  <audio id="audioElement" preload="metadata"></audio>
+
+  <script>
+    (() => {
+      // ─── PALETTES DE DÉGRADÉS PASTEL POUR LES DOSSIERS & POCHETTES ───
+      const PASTEL_ARTWORKS = [
+        { bg: 'linear-gradient(135deg, #ffd6e8 0%, #c8b6ff 100%)', dot: '#b794f4' },
+        { bg: 'linear-gradient(135deg, #ffdfd3 0%, #ffb7b2 100%)', dot: '#fb7185' },
+        { bg: 'linear-gradient(135deg, #d4f8e8 0%, #a2d2ff 100%)', dot: '#38bdf8' },
+        { bg: 'linear-gradient(135deg, #e2d4ff 0%, #bde0fe 100%)', dot: '#818cf8' },
+        { bg: 'linear-gradient(135deg, #fff1c1 0%, #ffd6e0 100%)', dot: '#f472b6' },
+        { bg: 'linear-gradient(135deg, #c7f9cc 0%, #b8f2e6 100%)', dot: '#34d399' }
+      ];
+
+      function getPastelForKey(str) {
+        let h = 0;
+        const s = String(str || '');
+        for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+        return PASTEL_ARTWORKS[h % PASTEL_ARTWORKS.length];
+      }
+
+      // ─── MOTEUR DE PARTICULES SPATIALES, ÉTOILES ("SPARES") & FLARES ───
+      const canvas = document.getElementById('cosmosCanvas');
+      const ctx = canvas.getContext('2d');
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+      let mouseX = cw / 2;
+      let mouseY = ch / 2;
+      const particles = [];
+      const sparkles = [];
+      const burstSparks = [];
+      const shootingStars = [];
+
+      const PARTICLE_COLORS_LIGHT = [
+        'rgba(155, 115, 255, 0.55)',
+        'rgba(255, 120, 180, 0.52)',
+        'rgba(90, 185, 255, 0.52)',
+        'rgba(80, 210, 175, 0.48)',
+        'rgba(255, 170, 110, 0.5)'
+      ];
+      const PARTICLE_COLORS_DARK = [
+        'rgba(215, 195, 255, 0.82)',
+        'rgba(255, 180, 220, 0.8)',
+        'rgba(165, 225, 255, 0.8)',
+        'rgba(170, 250, 225, 0.75)',
+        'rgba(255, 255, 255, 0.9)'
+      ];
+
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        canvas.width = cw * dpr;
+        canvas.height = ch * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // Créer les poussières cosmiques flottantes
+      for (let i = 0; i < 68; i++) {
+        particles.push({
+          x: Math.random() * cw,
+          y: Math.random() * ch,
+          r: 1.1 + Math.random() * 2.8,
+          vx: (Math.random() - 0.5) * 0.28,
+          vy: -0.08 - Math.random() * 0.25,
+          depth: 0.2 + Math.random() * 0.8,
+          colorIdx: i % 5,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+
+      // Créer les étoiles à 4 branches ("spares / sparkles") qui scintillent
+      for (let i = 0; i < 26; i++) {
+        sparkles.push({
+          x: Math.random() * cw,
+          y: Math.random() * ch,
+          size: 4 + Math.random() * 8,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.018 + Math.random() * 0.035,
+          colorIdx: i % 5
+        });
+      }
+
+      // Dessiner une étoile / diamant 4 branches avec cœur lumineux (flare)
+      function drawFourPointStar(x, y, radius, color, alpha) {
+        if (radius <= 0.3 || alpha <= 0.02) return;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.globalAlpha = Math.min(1, alpha);
+
+        // Halo doux autour de l'étoile
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 2.2);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Forme étoile 4 branches
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        const inner = radius * 0.22;
+        ctx.moveTo(0, -radius);
+        ctx.quadraticCurveTo(inner, -inner, radius, 0);
+        ctx.quadraticCurveTo(inner, inner, 0, radius);
+        ctx.quadraticCurveTo(-inner, inner, -radius, 0);
+        ctx.quadraticCurveTo(-inner, -inner, 0, -radius);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Explosion de petites étoiles au clic ou au lancement d'un son
+      function spawnSparkBurst(x, y, count = 14) {
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+          const speed = 1.2 + Math.random() * 3.2;
+          burstSparks.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 0.4,
+            size: 4 + Math.random() * 6,
+            life: 1,
+            decay: 0.02 + Math.random() * 0.02,
+            colorIdx: Math.floor(Math.random() * 5)
+          });
+        }
+      }
+
+      window.addEventListener('pointermove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animateCosmos() {
+        ctx.clearRect(0, 0, cw, ch);
+        const isDark = document.body.classList.contains('cosmic-night');
+        const palette = isDark ? PARTICLE_COLORS_DARK : PARTICLE_COLORS_LIGHT;
+        const speedMult = state.isPlaying ? 2.1 : 1.0;
+
+        const parallaxX = ((mouseX - cw / 2) / cw) * 18;
+        const parallaxY = ((mouseY - ch / 2) / ch) * 18;
+
+        // 1. Particules d'espace flottantes
+        for (const p of particles) {
+          p.phase += 0.02 * speedMult;
+          p.x += p.vx * speedMult + Math.sin(p.phase) * 0.12;
+          p.y += p.vy * speedMult;
+
+          if (p.y < -12) p.y = ch + 12;
+          if (p.y > ch + 12) p.y = -12;
+          if (p.x < -12) p.x = cw + 12;
+          if (p.x > cw + 12) p.x = -12;
+
+          const drawX = p.x + parallaxX * p.depth;
+          const drawY = p.y + parallaxY * p.depth;
+
+          ctx.beginPath();
+          ctx.fillStyle = palette[p.colorIdx];
+          ctx.arc(drawX, drawY, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 2. Étoiles scintillantes à 4 branches ("spares")
+        for (const s of sparkles) {
+          s.phase += s.speed * (state.isPlaying ? 1.6 : 1);
+          const twinkle = (Math.sin(s.phase) + 1) * 0.5; // 0 -> 1
+          const currentSize = s.size * (0.35 + twinkle * 0.85);
+          const color = isDark ? '#ffffff' : palette[s.colorIdx];
+          drawFourPointStar(
+            s.x - parallaxX * 0.4,
+            s.y - parallaxY * 0.4,
+            currentSize,
+            color,
+            0.25 + twinkle * 0.7
+          );
+        }
+
+        // 3. Étoiles filantes occasionnelles (micro-comètes pastel)
+        if (Math.random() < (state.isPlaying ? 0.018 : 0.007) && shootingStars.length < 2) {
+          shootingStars.push({
+            x: Math.random() * cw * 0.8 + cw * 0.1,
+            y: Math.random() * ch * 0.45,
+            vx: 5 + Math.random() * 4,
+            vy: 2 + Math.random() * 2.5,
+            len: 55 + Math.random() * 45,
+            life: 1
+          });
+        }
+
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+          const st = shootingStars[i];
+          st.x += st.vx;
+          st.y += st.vy;
+          st.life -= 0.022;
+          if (st.life <= 0) {
+            shootingStars.splice(i, 1);
+            continue;
+          }
+          const tailX = st.x - st.vx * (st.len / 6);
+          const tailY = st.y - st.vy * (st.len / 6);
+          const grad = ctx.createLinearGradient(st.x, st.y, tailX, tailY);
+          grad.addColorStop(0, isDark ? `rgba(255,255,255,${st.life})` : `rgba(140, 100, 255, ${st.life})`);
+          grad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(st.x, st.y);
+          ctx.lineTo(tailX, tailY);
+          ctx.stroke();
+          drawFourPointStar(st.x, st.y, 5 * st.life, isDark ? '#ffffff' : '#a855f7', st.life);
+        }
+
+        // 4. Éclats d'étoiles interactifs (clic / lecture)
+        for (let i = burstSparks.length - 1; i >= 0; i--) {
+          const b = burstSparks[i];
+          b.x += b.vx;
+          b.y += b.vy;
+          b.vy += 0.04;
+          b.life -= b.decay;
+          if (b.life <= 0) {
+            burstSparks.splice(i, 1);
+            continue;
+          }
+          drawFourPointStar(b.x, b.y, b.size * b.life, palette[b.colorIdx], b.life);
+        }
+
+        requestAnimationFrame(animateCosmos);
+      }
+
+      const urlInitParams = new URLSearchParams(window.location.search);
+      if (urlInitParams.get('pin')) {
+        localStorage.setItem('vault_pin', urlInitParams.get('pin'));
+      }
+
+      // ─── ÉTAT DE L'APPLICATION ───
+      const state = {
+        allTracks: [],
+        categories: [],
+        filteredTracks: [],
+        displayLimit: 60,
+        activeCategory: 'ALL',
+        activeFormat: 'ALL',
+        searchQuery: '',
+        sortBy: 'recent',
+        currentTrack: null,
+        isPlaying: false,
+        loopMode: 'all',
+        shuffle: false,
+        speedPresets: [
+          { rate: 1.0, tapePitch: false, label: '1.00x' },
+          { rate: 0.85, tapePitch: true, label: '0.85x Slowed' },
+          { rate: 0.92, tapePitch: true, label: '0.92x Tape' },
+          { rate: 1.12, tapePitch: true, label: '1.12x Sped' },
+          { rate: 1.25, tapePitch: false, label: '1.25x Fast' }
+        ],
+        speedIndex: 0,
+        pin: localStorage.getItem('vault_pin') || '',
+        online: true,
+        rootPath: ''
+      };
+
+      const BAR_COUNT = 68;
+      const audio = document.getElementById('audioElement');
+
+      // DOM Elements
+      const tracksListEl = document.getElementById('tracksList');
+      const loadMoreWrap = document.getElementById('loadMoreWrap');
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      const phoneConnectBtn = document.getElementById('phoneConnectBtn');
+      const phoneDrawer = document.getElementById('phoneDrawer');
+      const closePhoneBtn = document.getElementById('closePhoneBtn');
+      const qrImage = document.getElementById('qrImage');
+      const phoneLinksBox = document.getElementById('phoneLinksBox');
+      const foldersBarEl = document.getElementById('foldersBar');
+      const searchInput = document.getElementById('searchInput');
+      const searchClear = document.getElementById('searchClear');
+      const formatFilter = document.getElementById('formatFilter');
+      const sortSelect = document.getElementById('sortSelect');
+      const syncBtn = document.getElementById('syncBtn');
+      const shareFolderBtn = document.getElementById('shareFolderBtn');
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const brandOrb = document.getElementById('brandOrb');
+      const statCount = document.getElementById('statCount');
+      const statDuration = document.getElementById('statDuration');
+      const statSize = document.getElementById('statSize');
+      const statusDot = document.getElementById('statusDot');
+      const artistTitle = document.getElementById('artistTitle');
+      const folderSubtitle = document.getElementById('folderSubtitle');
+
+      // Player DOM
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const playIcon = document.getElementById('playIcon');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const seekBackBtn = document.getElementById('seekBackBtn');
+      const seekFwdBtn = document.getElementById('seekFwdBtn');
+      const loopBtn = document.getElementById('loopBtn');
+      const shuffleBtn = document.getElementById('shuffleBtn');
+      const speedBtn = document.getElementById('speedBtn');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const npTitle = document.getElementById('npTitle');
+      const npSub = document.getElementById('npSub');
+      const npFormatBox = document.getElementById('npFormatBox');
+      const npDownloadBtn = document.getElementById('npDownloadBtn');
+      const timeCurrent = document.getElementById('timeCurrent');
+      const timeTotal = document.getElementById('timeTotal');
+      const waveformScrubber = document.getElementById('waveformScrubber');
+      const waveformBars = document.getElementById('waveformBars');
+      const waveformMarkers = document.getElementById('waveformMarkers');
+
+      // Notes Drawer DOM
+      const openNotesBtn = document.getElementById('openNotesBtn');
+      const npNotesCount = document.getElementById('npNotesCount');
+      const notesDrawer = document.getElementById('notesDrawer');
+      const closeNotesBtn = document.getElementById('closeNotesBtn');
+      const notesTrackTitle = document.getElementById('notesTrackTitle');
+      const notesList = document.getElementById('notesList');
+      const noteForm = document.getElementById('noteForm');
+      const noteInput = document.getElementById('noteInput');
+      const noteSubmitBtn = document.getElementById('noteSubmitBtn');
+
+      const toastEl = document.getElementById('toast');
+      const pinModal = document.getElementById('pinModal');
+      const pinForm = document.getElementById('pinForm');
+      const pinInput = document.getElementById('pinInput');
+
+      // Thème Pastel Jour / Nuit Étoilée Pastel
+      if (localStorage.getItem('vault_theme') === 'cosmic-night') {
+        document.body.classList.add('cosmic-night');
+      }
+      themeToggleBtn.addEventListener('click', (e) => {
+        document.body.classList.toggle('cosmic-night');
+        const isNight = document.body.classList.contains('cosmic-night');
+        localStorage.setItem('vault_theme', isNight ? 'cosmic-night' : 'pastel-day');
+        spawnSparkBurst(e.clientX || cw / 2, e.clientY || 40, 16);
+      });
+
+      brandOrb.addEventListener('click', (e) => {
+        const rect = brandOrb.getBoundingClientRect();
+        spawnSparkBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 20);
+      });
+
+      // Démarrer l'animation cosmique
+      requestAnimationFrame(animateCosmos);
+
+      // ─── UTILITAIRES ───
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+
+      function formatTime(sec) {
+        if (!sec || isNaN(sec) || sec < 0) return '00:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+
+      function formatTotalDuration(sec) {
+        if (!sec || sec <= 0) return '0m';
+        const h = Math.floor(sec / 3600);
+        const m = Math.round((sec % 3600) / 60);
+        return h > 0 ? `${h}h ${m}m` : `${m} min`;
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes) return '0 Mo';
+        const mb = bytes / (1024 * 1024);
+        if (mb >= 1024) return `${(mb / 1024).toFixed(2)} Go`;
+        return `${mb.toFixed(1)} Mo`;
+      }
+
+      function formatRelativeDate(isoStr) {
+        const d = new Date(isoStr);
+        const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
+        if (diffDays <= 0) return "Aujourd'hui";
+        if (diffDays === 1) return 'Hier';
+        if (diffDays < 7) return `Il y a ${diffDays}j`;
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' });
+      }
+
+      function isLossless(fmt) {
+        return ['WAV', 'FLAC', 'AIFF', 'AIF', 'ALAC'].includes(fmt);
+      }
+
+      function apiHeaders(extra = {}) {
+        const h = { ...extra };
+        if (state.pin) h['X-Vault-Pin'] = state.pin;
+        return h;
+      }
+
+      function buildStreamUrl(track) {
+        if (state.isVercelCloud && track.vaultHashFile) {
+          return `/audio/${track.vaultHashFile}`;
+        }
+        const params = new URLSearchParams({ path: track.relPath });
+        if (state.pin) params.set('pin', state.pin);
+        return `/api/stream?${params.toString()}`;
+      }
+
+      function buildDownloadUrl(track) {
+        if (state.isVercelCloud && track.vaultHashFile) {
+          return `/audio/${track.vaultHashFile}`;
+        }
+        const params = new URLSearchParams({ path: track.relPath });
+        if (state.pin) params.set('pin', state.pin);
+        return `/api/download?${params.toString()}`;
+      }
+
+      function getLocalFavs() {
+        try { return JSON.parse(localStorage.getItem('vault_local_favs') || '{}'); } catch (e) { return {}; }
+      }
+      function getLocalNotes() {
+        try { return JSON.parse(localStorage.getItem('vault_local_notes') || '{}'); } catch (e) { return {}; }
+      }
+
+      // ─── WAVEFORM INTERACTIVE ───
+      function renderWaveformForTrack(seedStr) {
+        waveformBars.innerHTML = '';
+        let hash = 2166136261;
+        const s = seedStr || 'default-vault';
+        for (let i = 0; i < s.length; i++) {
+          hash ^= s.charCodeAt(i);
+          hash = Math.imul(hash, 16777619);
+        }
+
+        for (let i = 0; i < BAR_COUNT; i++) {
+          hash ^= i * 37;
+          hash = Math.imul(hash, 16777619);
+          const norm = (Math.abs(hash) % 100) / 100;
+          const pos = i / BAR_COUNT;
+          const env = pos < 0.08 ? pos / 0.08 : (pos > 0.9 ? (1 - pos) / 0.1 : 1);
+          const heightPct = Math.max(18, Math.round((24 + norm * 76) * Math.max(0.38, env)));
+
+          const bar = document.createElement('div');
+          bar.className = 'wf-bar';
+          bar.style.height = `${heightPct}%`;
+          waveformBars.appendChild(bar);
+        }
+        updateWaveformProgress();
+        renderWaveformNotePins();
+      }
+
+      function updateWaveformProgress() {
+        const bars = waveformBars.children;
+        if (!bars.length) return;
+        const dur = audio.duration || (state.currentTrack && state.currentTrack.duration) || 0;
+        const ratio = dur > 0 ? Math.min(1, Math.max(0, audio.currentTime / dur)) : 0;
+        const playedCount = Math.floor(ratio * bars.length);
+        for (let i = 0; i < bars.length; i++) {
+          bars[i].classList.toggle('played', i <= playedCount && dur > 0);
+        }
+      }
+
+      function renderWaveformNotePins() {
+        waveformMarkers.innerHTML = '';
+        if (!state.currentTrack || !Array.isArray(state.currentTrack.notes)) return;
+        const dur = audio.duration || state.currentTrack.duration || 0;
+        if (!dur) return;
+
+        for (const note of state.currentTrack.notes) {
+          if (typeof note.timeSec === 'number' && note.timeSec >= 0 && note.timeSec <= dur) {
+            const pin = document.createElement('div');
+            pin.className = 'wf-note-pin';
+            pin.style.left = `${(note.timeSec / dur) * 100}%`;
+            pin.title = `${formatTime(note.timeSec)} — ${note.text}`;
+            waveformMarkers.appendChild(pin);
+          }
+        }
+      }
+
+      // ─── CHARGEMENT DE LA BIBLIOTHÈQUE (SERVEUR LOCAL OU CLOUD VERCEL PRIVÉ) ───
+      async function fetchLibrary(silent = false) {
+        if (!silent) syncBtn.classList.add('spinning');
+        try {
+          const isVercelHost = window.location.hostname.endsWith('.vercel.app');
+          state.isVercelCloud = isVercelHost;
+
+          const res = await fetch(`/api/library?t=${Date.now()}`, {
+            headers: apiHeaders(),
+            cache: 'no-store'
+          });
+          if (res.status === 401) {
+            pinModal.classList.add('open');
+            setTimeout(() => pinInput.focus(), 100);
+            return;
+          }
+          pinModal.classList.remove('open');
+          const data = await res.json();
+
+          if (isVercelHost) {
+            const localFavs = getLocalFavs();
+            const localNotes = getLocalNotes();
+            for (const t of (data.tracks || [])) {
+              if (localFavs[t.relPath] !== undefined) t.isFavorite = Boolean(localFavs[t.relPath]);
+              if (localNotes[t.relPath]) t.notes = localNotes[t.relPath];
+            }
+          }
+
+          const prevCount = state.allTracks.length;
+          const prevSig = state.signature;
+
+          state.online = data.online !== false;
+          state.signature = data.signature || '';
+          state.rootPath = data.rootPath || 'FL GANG / ici';
+          state.allTracks = data.tracks || [];
+          state.categories = data.categories || [];
+
+          if (silent && prevSig && data.signature && prevSig !== data.signature) {
+            const diff = state.allTracks.length - prevCount;
+            if (diff > 0) {
+              showToast(`✦ +${diff} nouveau${diff > 1 ? 'x' : ''} son${diff > 1 ? 's' : ''} détecté${diff > 1 ? 's' : ''} en direct !`);
+              spawnSparkBurst(cw / 2, 80, 18);
+            } else if (diff < 0) {
+              showToast(`✦ Bibliothèque mise à jour en direct`);
+            }
+          }
+
+          if (data.artistName && data.artistName !== 'STUDIO VAULT') {
+            artistTitle.textContent = data.artistName;
+          }
+
+          statusDot.classList.toggle('offline', !state.online);
+          folderSubtitle.textContent = state.online
+            ? `Synchronisation directe FileZilla • ${state.categories.length} dossiers`
+            : `Disque dur externe en attente`;
+
+          statCount.textContent = data.stats ? data.stats.totalTracks : 0;
+          statDuration.textContent = formatTotalDuration(data.stats ? data.stats.totalDurationSec : 0);
+          statSize.textContent = formatBytes(data.stats ? data.stats.totalSizeBytes : 0);
+
+          populateFormatOptions();
+          renderCategoriesBar();
+          applyFiltersAndRender();
+
+          if (state.currentTrack) {
+            const updated = state.allTracks.find(t => t.relPath === state.currentTrack.relPath);
+            if (updated) {
+              state.currentTrack = updated;
+              updateNotesBadge();
+            }
+          } else {
+            handleUrlDeepLink();
+          }
+        } catch (err) {
+          statusDot.classList.add('offline');
+          showToast('Serveur inaccessible');
+        } finally {
+          syncBtn.classList.remove('spinning');
+        }
+      }
+
+      let deepLinkHandled = false;
+      function handleUrlDeepLink() {
+        if (deepLinkHandled) return;
+        deepLinkHandled = true;
+        const params = new URLSearchParams(window.location.search);
+        const catParam = params.get('cat');
+        const trackParam = params.get('track');
+
+        if (catParam) {
+          state.activeCategory = catParam;
+          renderCategoriesBar();
+          applyFiltersAndRender();
+        }
+
+        if (trackParam) {
+          const found = state.allTracks.find(
+            t => t.relPath === trackParam || t.id === trackParam || t.fileName === trackParam
+          );
+          if (found) {
+            loadTrack(found, false);
+            showToast(`Morceau partagé prêt : ${found.title}`);
+          }
+        }
+      }
+
+      function populateFormatOptions() {
+        const formats = Array.from(new Set(state.allTracks.map(t => t.format))).sort();
+        const prev = state.activeFormat;
+        formatFilter.innerHTML = `<option value="ALL">Tous formats</option>`;
+        for (const fmt of formats) {
+          const opt = document.createElement('option');
+          opt.value = fmt;
+          opt.textContent = fmt;
+          formatFilter.appendChild(opt);
+        }
+        if (formats.includes(prev)) {
+          formatFilter.value = prev;
+        } else {
+          state.activeFormat = 'ALL';
+        }
+      }
+
+      function renderCategoriesBar() {
+        foldersBarEl.innerHTML = '';
+
+        const favCount = state.allTracks.filter(t => t.isFavorite).length;
+        const tabs = [
+          { id: 'ALL', label: 'Tous les sons', count: state.allTracks.length, dot: null },
+          { id: 'FAV', label: '★ Favoris', count: favCount, dot: '#f59e0b' }
+        ];
+
+        for (const cat of state.categories) {
+          const pal = getPastelForKey(cat.name);
+          tabs.push({
+            id: cat.name,
+            label: cat.name === 'Racine' ? 'Racine' : cat.name,
+            count: cat.count,
+            dot: pal.dot
+          });
+        }
+
+        for (const tab of tabs) {
+          const btn = document.createElement('button');
+          btn.className = `folder-tab ${state.activeCategory === tab.id ? 'active' : ''}`;
+          btn.innerHTML = `
+            ${tab.dot ? `<span class="folder-dot" style="background:${tab.dot};"></span>` : ''}
+            <span>${escapeHtml(tab.label)}</span>
+            <span class="folder-count mono">${tab.count}</span>
+          `;
+          btn.addEventListener('click', (e) => {
+            state.activeCategory = tab.id;
+            state.displayLimit = 60;
+            renderCategoriesBar();
+            applyFiltersAndRender();
+            spawnSparkBurst(e.clientX, e.clientY, 8);
+          });
+          foldersBarEl.appendChild(btn);
+        }
+      }
+
+      function applyFiltersAndRender() {
+        const q = state.searchQuery.trim().toLowerCase();
+
+        state.filteredTracks = state.allTracks.filter(t => {
+          if (state.activeCategory === 'FAV' && !t.isFavorite) return false;
+          if (state.activeCategory !== 'ALL' && state.activeCategory !== 'FAV' && t.category !== state.activeCategory) {
+            return false;
+          }
+          if (state.activeFormat !== 'ALL' && t.format !== state.activeFormat) {
+            return false;
+          }
+          if (q) {
+            const hay = `${t.title} ${t.fileName} ${t.category} ${t.subFolder || ''} ${t.folderPath} ${t.format} ${t.bpm ? t.bpm + 'bpm' : ''} ${t.musicalKey || ''}`.toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          return true;
+        });
+
+        state.filteredTracks.sort((a, b) => {
+          switch (state.sortBy) {
+            case 'oldest': return a.mtimeMs - b.mtimeMs;
+            case 'name': return a.title.localeCompare(b.title, 'fr');
+            case 'bpm': return (b.bpm || 0) - (a.bpm || 0);
+            case 'duration': return (b.duration || 0) - (a.duration || 0);
+            case 'size': return b.sizeBytes - a.sizeBytes;
+            case 'recent':
+            default:
+              if (a.isRootProd !== b.isRootProd) return a.isRootProd ? -1 : 1;
+              return b.mtimeMs - a.mtimeMs;
+          }
+        });
+
+        renderTracksList();
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderTracksList() {
+        tracksListEl.innerHTML = '';
+
+        if (!state.online) {
+          tracksListEl.innerHTML = `
+            <div class="empty-state">
+              <h3>Disque dur externe en attente</h3>
+              <p>Le serveur est bien en ligne, mais le dossier (<span class="mono">${escapeHtml(state.rootPath)}</span>) n'est pas encore branché. Dès qu'il est allumé, clique sur <strong>Sync</strong>.</p>
+            </div>
+          `;
+          return;
+        }
+
+        if (state.filteredTracks.length === 0) {
+          loadMoreWrap.style.display = 'none';
+          tracksListEl.innerHTML = `
+            <div class="empty-state">
+              <h3>Aucun morceau dans cette sélection</h3>
+              <p>Ouvre <strong>FileZilla</strong> et glisse tes fichiers audio (<span class="mono">.mp3, .wav, .flac, .aiff, .m4a</span>) dans tes dossiers pour les voir apparaître ici.</p>
+              <div class="code-snippet mono">${escapeHtml(state.rootPath)}</div>
+            </div>
+          `;
+          return;
+        }
+
+        const visibleSlice = state.filteredTracks.slice(0, state.displayLimit);
+        const remaining = state.filteredTracks.length - visibleSlice.length;
+        if (remaining > 0) {
+          loadMoreWrap.style.display = 'block';
+          loadMoreBtn.textContent = `Afficher la suite (+${Math.min(80, remaining)} sur ${remaining} restants)`;
+        } else {
+          loadMoreWrap.style.display = 'none';
+        }
+
+        for (const track of visibleSlice) {
+          const isCurrent = state.currentTrack && state.currentTrack.relPath === track.relPath;
+          const artPalette = getPastelForKey(track.category + track.title);
+          const card = document.createElement('div');
+          card.className = `track-card ${isCurrent ? 'playing' : ''}`;
+
+          const techSpecs = [];
+          if (track.sampleRate) techSpecs.push(`${(track.sampleRate / 1000).toFixed(1).replace('.0', '')} kHz`);
+          if (track.bitsPerSample) techSpecs.push(`${track.bitsPerSample}-bit`);
+          else if (track.bitrate) techSpecs.push(`${track.bitrate} kbps`);
+          techSpecs.push(formatBytes(track.sizeBytes));
+
+          const notesCount = Array.isArray(track.notes) ? track.notes.length : 0;
+
+          card.innerHTML = `
+            <div class="track-art" style="background: ${artPalette.bg};" aria-label="Lire ${escapeHtml(track.title)}">
+              <div class="track-art-play">
+                ${isCurrent && state.isPlaying
+                  ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
+                  : `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`
+                }
+              </div>
+            </div>
+
+            <div class="track-main">
+              <div class="track-title-row">
+                <span class="track-title">${escapeHtml(track.title)}</span>
+              </div>
+              <div class="track-meta-row">
+                <span class="badge badge-folder">${escapeHtml(track.subFolder || track.category)}</span>
+                <span class="badge badge-format mono ${isLossless(track.format) ? 'lossless' : ''}">${escapeHtml(track.format)}</span>
+                ${track.bpm ? `<span class="badge badge-bpm mono">${track.bpm} BPM</span>` : ''}
+                ${track.musicalKey ? `<span class="badge badge-key mono">${escapeHtml(track.musicalKey)}</span>` : ''}
+                ${notesCount > 0 ? `<span class="badge badge-notes">✦ ${notesCount}</span>` : ''}
+                <span class="meta-sep">•</span>
+                <span class="mono" style="font-size:0.7rem;">${techSpecs.join(' · ')}</span>
+                <span class="meta-sep">•</span>
+                <span>${formatRelativeDate(track.addedAt)}</span>
+              </div>
+            </div>
+
+            <div class="track-actions">
+              <span class="track-duration mono" id="dur-${track.id}">${track.duration ? formatTime(track.duration) : '--:--'}</span>
+              <button class="icon-btn fav-btn ${track.isFavorite ? 'fav-active' : ''}" title="Favori">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="${track.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <button class="icon-btn share-btn" title="Partager ce morceau">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              </button>
+              <a class="icon-btn dl-btn" href="${buildDownloadUrl(track)}" download="${escapeHtml(track.fileName)}" title="Télécharger ${escapeHtml(track.fileName)}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </a>
+            </div>
+          `;
+
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.fav-btn') || e.target.closest('.share-btn') || e.target.closest('.dl-btn')) {
+              return;
+            }
+            spawnSparkBurst(e.clientX, e.clientY, 12);
+            if (isCurrent) {
+              togglePlayPause();
+            } else {
+              loadTrack(track, true);
+            }
+          });
+
+          card.querySelector('.fav-btn').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            track.isFavorite = !track.isFavorite;
+            const favs = getLocalFavs();
+            if (track.isFavorite) favs[track.relPath] = true; else delete favs[track.relPath];
+            localStorage.setItem('vault_local_favs', JSON.stringify(favs));
+            spawnSparkBurst(e.clientX, e.clientY, 10);
+            renderCategoriesBar();
+            applyFiltersAndRender();
+            if (!state.isVercelCloud) {
+              try {
+                await fetch('/api/track/favorite', {
+                  method: 'POST',
+                  headers: apiHeaders({ 'Content-Type': 'application/json' }),
+                  body: JSON.stringify({ relPath: track.relPath })
+                });
+              } catch (err) {}
+            }
+          });
+
+          card.querySelector('.share-btn').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const shareParams = new URLSearchParams({ track: track.relPath });
+            if (state.pin) shareParams.set('pin', state.pin);
+            const shareUrl = `${window.location.origin}/?${shareParams.toString()}`;
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: track.title,
+                  text: `Écoute "${track.title}" :`,
+                  url: shareUrl
+                });
+                return;
+              } catch (err) {}
+            }
+            try {
+              await navigator.clipboard.writeText(shareUrl);
+              showToast('Lien du morceau copié !');
+            } catch (err) {
+              prompt('Copie ce lien de partage :', shareUrl);
+            }
+          });
+
+          tracksListEl.appendChild(card);
+        }
+      }
+
+      // ─── LECTEUR AUDIO & MEDIA SESSION (iPHONE LOCK SCREEN) ───
+      function loadTrack(track, autoPlay = true) {
+        state.currentTrack = track;
+        const streamUrl = buildStreamUrl(track);
+        audio.src = streamUrl;
+        applySpeedPreset();
+
+        npTitle.textContent = track.title;
+        const subParts = [track.category, track.format];
+        if (track.bpm) subParts.push(`${track.bpm} BPM`);
+        if (track.musicalKey) subParts.push(track.musicalKey);
+        subParts.push(formatBytes(track.sizeBytes));
+        npSub.textContent = subParts.join(' · ');
+
+        const pal = getPastelForKey(track.category + track.title);
+        npFormatBox.style.background = pal.bg;
+        npFormatBox.textContent = track.format;
+        npDownloadBtn.href = buildDownloadUrl(track);
+        npDownloadBtn.setAttribute('download', track.fileName);
+        timeTotal.textContent = track.duration ? formatTime(track.duration) : '00:00';
+        timeCurrent.textContent = '00:00';
+
+        renderWaveformForTrack(track.relPath);
+        updateNotesBadge();
+        renderTracksList();
+        setupMediaSession(track);
+
+        if (autoPlay) {
+          audio.play().then(() => {
+            fetch('/api/track/play', {
+              method: 'POST',
+              headers: apiHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ relPath: track.relPath })
+            }).catch(() => {});
+          }).catch(err => {
+            console.warn('Autoplay bloqué:', err);
+          });
+        }
+      }
+
+      function togglePlayPause() {
+        if (!state.currentTrack) {
+          if (state.filteredTracks.length > 0) {
+            loadTrack(state.filteredTracks[0], true);
+          }
+          return;
+        }
+        if (audio.paused) {
+          audio.play().catch(() => {});
+        } else {
+          audio.pause();
+        }
+      }
+
+      function playNextTrack(autoTriggered = false) {
+        const list = state.filteredTracks.length > 0 ? state.filteredTracks : state.allTracks;
+        if (!list.length) return;
+
+        if (autoTriggered && state.loopMode === 'one' && state.currentTrack) {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+          return;
+        }
+
+        if (state.shuffle && list.length > 1) {
+          const candidates = list.filter(t => !state.currentTrack || t.relPath !== state.currentTrack.relPath);
+          const next = candidates[Math.floor(Math.random() * candidates.length)];
+          loadTrack(next, true);
+          return;
+        }
+
+        const idx = state.currentTrack ? list.findIndex(t => t.relPath === state.currentTrack.relPath) : -1;
+        const nextIdx = (idx + 1) % list.length;
+        loadTrack(list[nextIdx], true);
+      }
+
+      function playPrevTrack() {
+        if (audio.currentTime > 3) {
+          audio.currentTime = 0;
+          return;
+        }
+        const list = state.filteredTracks.length > 0 ? state.filteredTracks : state.allTracks;
+        if (!list.length) return;
+        const idx = state.currentTrack ? list.findIndex(t => t.relPath === state.currentTrack.relPath) : 0;
+        const prevIdx = (idx - 1 + list.length) % list.length;
+        loadTrack(list[prevIdx], true);
+      }
+
+      function applySpeedPreset() {
+        const preset = state.speedPresets[state.speedIndex];
+        audio.preservesPitch = !preset.tapePitch;
+        audio.mozPreservesPitch = !preset.tapePitch;
+        audio.webkitPreservesPitch = !preset.tapePitch;
+        audio.playbackRate = preset.rate;
+        speedBtn.querySelector('span').textContent = preset.label;
+        speedBtn.classList.toggle('active', preset.rate !== 1.0);
+      }
+
+      function setupMediaSession(track) {
+        if (!('mediaSession' in navigator)) return;
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.title,
+          artist: artistTitle.textContent || 'Ma Bibliothèque',
+          album: `${track.category} (${track.format})`,
+          artwork: [
+            { src: '/icon.svg', sizes: '512x512', type: 'image/svg+xml' }
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => playPrevTrack());
+        navigator.mediaSession.setActionHandler('nexttrack', () => playNextTrack(false));
+        navigator.mediaSession.setActionHandler('seekbackward', () => {
+          audio.currentTime = Math.max(0, audio.currentTime - 10);
+        });
+        navigator.mediaSession.setActionHandler('seekforward', () => {
+          audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
+        });
+      }
+
+      audio.addEventListener('play', () => {
+        state.isPlaying = true;
+        document.body.classList.add('is-playing');
+        playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        renderTracksList();
+      });
+
+      audio.addEventListener('pause', () => {
+        state.isPlaying = false;
+        document.body.classList.remove('is-playing');
+        playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+        renderTracksList();
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        if (audio.duration && isFinite(audio.duration)) {
+          timeTotal.textContent = formatTime(audio.duration);
+          if (state.currentTrack && !state.currentTrack.duration) {
+            state.currentTrack.duration = audio.duration;
+            const cell = document.getElementById(`dur-${state.currentTrack.id}`);
+            if (cell) cell.textContent = formatTime(audio.duration);
+          }
+          renderWaveformNotePins();
+        }
+        applySpeedPreset();
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        timeCurrent.textContent = formatTime(audio.currentTime);
+        noteSubmitBtn.textContent = `+ ${formatTime(audio.currentTime)}`;
+        updateWaveformProgress();
+      });
+
+      audio.addEventListener('ended', () => {
+        playNextTrack(true);
+      });
+
+      // Scrubbing sur la waveform + étoiles au toucher
+      let isScrubbing = false;
+      function seekFromPointer(clientX, clientY) {
+        if (!state.currentTrack) return;
+        const dur = audio.duration || state.currentTrack.duration || 0;
+        if (!dur) return;
+        const rect = waveformScrubber.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+        audio.currentTime = ratio * dur;
+        updateWaveformProgress();
+        if (clientY) spawnSparkBurst(clientX, clientY, 4);
+      }
+
+      waveformScrubber.addEventListener('pointerdown', (e) => {
+        isScrubbing = true;
+        waveformScrubber.setPointerCapture(e.pointerId);
+        seekFromPointer(e.clientX, e.clientY);
+      });
+      waveformScrubber.addEventListener('pointermove', (e) => {
+        if (isScrubbing) seekFromPointer(e.clientX, null);
+      });
+      waveformScrubber.addEventListener('pointerup', () => {
+        isScrubbing = false;
+      });
+
+      // ─── NOTES D'ÉCOUTE HORODATÉES ───
+      function updateNotesBadge() {
+        const count = state.currentTrack && Array.isArray(state.currentTrack.notes)
+          ? state.currentTrack.notes.length
+          : 0;
+        npNotesCount.textContent = `Notes (${count})`;
+        openNotesBtn.classList.toggle('active', count > 0);
+      }
+
+      function renderNotesDrawer() {
+        if (!state.currentTrack) return;
+        notesTrackTitle.textContent = state.currentTrack.title;
+        const notes = state.currentTrack.notes || [];
+        notesList.innerHTML = '';
+
+        if (notes.length === 0) {
+          notesList.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted); padding:14px 0; text-align:center;">Aucune note sur ce morceau pour l'instant.</div>`;
+          return;
+        }
+
+        const sorted = [...notes].sort((a, b) => (a.timeSec || 0) - (b.timeSec || 0));
+        for (const n of sorted) {
+          const row = document.createElement('div');
+          row.className = 'note-item';
+          row.innerHTML = `
+            <span class="note-time-chip mono" title="Aller à ${formatTime(n.timeSec)}">@ ${formatTime(n.timeSec)}</span>
+            <span class="note-text">${escapeHtml(n.text)}</span>
+            <button class="icon-btn del-note" title="Supprimer">&times;</button>
+          `;
+          row.querySelector('.note-time-chip').addEventListener('click', () => {
+            audio.currentTime = n.timeSec || 0;
+            audio.play().catch(() => {});
+          });
+          row.querySelector('.del-note').addEventListener('click', async () => {
+            if (state.isVercelCloud) {
+              const allNotes = getLocalNotes();
+              const arr = (state.currentTrack.notes || []).filter(item => item.id !== n.id);
+              allNotes[state.currentTrack.relPath] = arr;
+              localStorage.setItem('vault_local_notes', JSON.stringify(allNotes));
+              state.currentTrack.notes = arr;
+              updateNotesBadge();
+              renderNotesDrawer();
+              renderWaveformNotePins();
+              renderTracksList();
+              return;
+            }
+            const res = await fetch('/api/track/note/delete', {
+              method: 'POST',
+              headers: apiHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ relPath: state.currentTrack.relPath, noteId: n.id })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              state.currentTrack.notes = data.notes;
+              updateNotesBadge();
+              renderNotesDrawer();
+              renderWaveformNotePins();
+              renderTracksList();
+            }
+          });
+          notesList.appendChild(row);
+        }
+      }
+
+      openNotesBtn.addEventListener('click', () => {
+        if (!state.currentTrack) {
+          showToast("Lance d'abord un morceau pour annoter");
+          return;
+        }
+        renderNotesDrawer();
+        notesDrawer.classList.add('open');
+        setTimeout(() => noteInput.focus(), 80);
+      });
+
+      closeNotesBtn.addEventListener('click', () => notesDrawer.classList.remove('open'));
+      notesDrawer.addEventListener('click', (e) => {
+        if (e.target === notesDrawer) notesDrawer.classList.remove('open');
+      });
+
+      noteForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!state.currentTrack) return;
+        const text = noteInput.value.trim();
+        if (!text) return;
+
+        if (state.isVercelCloud) {
+          const allNotes = getLocalNotes();
+          const arr = Array.isArray(state.currentTrack.notes) ? [...state.currentTrack.notes] : [];
+          arr.push({
+            id: Date.now().toString(36),
+            text: text.slice(0, 300),
+            timeSec: Math.round(audio.currentTime || 0),
+            createdAt: new Date().toISOString()
+          });
+          allNotes[state.currentTrack.relPath] = arr;
+          localStorage.setItem('vault_local_notes', JSON.stringify(allNotes));
+          state.currentTrack.notes = arr;
+          noteInput.value = '';
+          updateNotesBadge();
+          renderNotesDrawer();
+          renderWaveformNotePins();
+          renderTracksList();
+          showToast('Note ajoutée !');
+          return;
+        }
+
+        const res = await fetch('/api/track/note', {
+          method: 'POST',
+          headers: apiHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            relPath: state.currentTrack.relPath,
+            text,
+            timeSec: Math.round(audio.currentTime || 0)
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          state.currentTrack.notes = data.notes;
+          noteInput.value = '';
+          updateNotesBadge();
+          renderNotesDrawer();
+          renderWaveformNotePins();
+          renderTracksList();
+          showToast('Note ajoutée !');
+        }
+      });
+
+      // ─── CONTRÔLES LECTEUR & FILTRES ───
+      playPauseBtn.addEventListener('click', (e) => {
+        spawnSparkBurst(e.clientX, e.clientY, 14);
+        togglePlayPause();
+      });
+      nextBtn.addEventListener('click', () => playNextTrack(false));
+      prevBtn.addEventListener('click', playPrevTrack);
+      seekBackBtn.addEventListener('click', () => {
+        audio.currentTime = Math.max(0, audio.currentTime - 10);
+      });
+      seekFwdBtn.addEventListener('click', () => {
+        audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
+      });
+
+      loopBtn.addEventListener('click', () => {
+        state.loopMode = state.loopMode === 'all' ? 'one' : 'all';
+        loopBtn.classList.toggle('active', state.loopMode === 'one');
+        showToast(state.loopMode === 'one' ? 'Boucle : 1 morceau en boucle' : 'Boucle : Toute la liste');
+      });
+
+      shuffleBtn.addEventListener('click', () => {
+        state.shuffle = !state.shuffle;
+        shuffleBtn.classList.toggle('active', state.shuffle);
+        showToast(state.shuffle ? 'Lecture aléatoire activée' : 'Lecture dans l’ordre');
+      });
+
+      speedBtn.addEventListener('click', () => {
+        state.speedIndex = (state.speedIndex + 1) % state.speedPresets.length;
+        applySpeedPreset();
+        const p = state.speedPresets[state.speedIndex];
+        showToast(`Vitesse : ${p.label}`);
+      });
+
+      volumeSlider.addEventListener('input', (e) => {
+        audio.volume = parseFloat(e.target.value);
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        state.displayLimit = 60;
+        searchClear.style.display = state.searchQuery ? 'block' : 'none';
+        applyFiltersAndRender();
+      });
+
+      loadMoreBtn.addEventListener('click', (e) => {
+        state.displayLimit += 80;
+        spawnSparkBurst(e.clientX, e.clientY, 10);
+        renderTracksList();
+      });
+
+      phoneConnectBtn.addEventListener('click', async () => {
+        phoneDrawer.classList.add('open');
+        const vercelUrl = 'https://dj-brain.vercel.app';
+        try {
+          if (state.isVercelCloud) {
+            const url = window.location.origin;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodeURIComponent(url)}`;
+            phoneLinksBox.innerHTML = `
+              <div class="note-item" style="justify-content:space-between;">
+                <span style="font-size:0.78rem; font-weight:700;">🌍 En ligne 24h/24 (4G/5G) :</span>
+                <a href="${url}" target="_blank" class="mono" style="font-size:0.78rem; color:#6c47ff; font-weight:700;">${url}</a>
+              </div>
+            `;
+            return;
+          }
+          const res = await fetch('/api/network-info');
+          const info = await res.json();
+          qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodeURIComponent(vercelUrl)}`;
+          phoneLinksBox.innerHTML = `
+            <div class="note-item" style="justify-content:space-between;">
+              <span style="font-size:0.78rem; font-weight:700;">🌍 Lien Cloud 4G/5G (Vercel) :</span>
+              <a href="${vercelUrl}" target="_blank" class="mono" style="font-size:0.78rem; color:#6c47ff; font-weight:700;">${vercelUrl}</a>
+            </div>
+            <div class="note-item" style="justify-content:space-between;">
+              <span style="font-size:0.78rem; font-weight:700;">📶 Lien Wi-Fi Local :</span>
+              <a href="${info.lanUrl}" target="_blank" class="mono" style="font-size:0.78rem; color:#6c47ff; font-weight:700;">${info.lanUrl}</a>
+            </div>
+          `;
+        } catch (e) {}
+      });
+
+      closePhoneBtn.addEventListener('click', () => phoneDrawer.classList.remove('open'));
+      phoneDrawer.addEventListener('click', (e) => {
+        if (e.target === phoneDrawer) phoneDrawer.classList.remove('open');
+      });
+
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        state.searchQuery = '';
+        searchClear.style.display = 'none';
+        applyFiltersAndRender();
+      });
+
+      formatFilter.addEventListener('change', (e) => {
+        state.activeFormat = e.target.value;
+        applyFiltersAndRender();
+      });
+
+      sortSelect.addEventListener('change', (e) => {
+        state.sortBy = e.target.value;
+        applyFiltersAndRender();
+      });
+
+      syncBtn.addEventListener('click', (e) => {
+        spawnSparkBurst(e.clientX, e.clientY, 12);
+        fetchLibrary(false).then(() => showToast('Bibliothèque synchronisée !'));
+      });
+
+      shareFolderBtn.addEventListener('click', async () => {
+        const urlObj = new URL(window.location.origin);
+        if (state.activeCategory !== 'ALL' && state.activeCategory !== 'FAV') {
+          urlObj.searchParams.set('cat', state.activeCategory);
+        }
+        if (state.pin) {
+          urlObj.searchParams.set('pin', state.pin);
+        }
+        const shareUrl = urlObj.toString();
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: artistTitle.textContent,
+              text: `Écoute mes prods (${state.activeCategory === 'ALL' ? 'Toute la bibliothèque' : 'Dossier ' + state.activeCategory}) :`,
+              url: shareUrl
+            });
+            return;
+          } catch (e) {}
+        }
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('Lien de partage copié !');
+        } catch (e) {
+          prompt('Copie ce lien :', shareUrl);
+        }
+      });
+
+      pinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        state.pin = pinInput.value.trim();
+        localStorage.setItem('vault_pin', state.pin);
+        fetchLibrary(false);
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          togglePlayPause();
+        } else if (e.code === 'ArrowRight') {
+          audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+        } else if (e.code === 'ArrowLeft') {
+          audio.currentTime = Math.max(0, audio.currentTime - 5);
+        } else if (e.key === '/') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          fetchLibrary(true);
+        }
+      });
+
+      // ─── CONNEXION TEMPS RÉEL (SSE + FALLBACK AUTO) ───
+      function connectLiveStream() {
+        if (window.location.hostname.endsWith('.vercel.app')) {
+          // Sur Vercel, vérifier silencieusement toutes les 15s si un nouveau son a été poussé
+          setInterval(() => fetchLibrary(true), 15000);
+          return;
+        }
+        try {
+          const evUrl = state.pin ? `/api/events?pin=${encodeURIComponent(state.pin)}` : '/api/events';
+          const es = new EventSource(evUrl);
+          es.onmessage = (e) => {
+            try {
+              const msg = JSON.parse(e.data);
+              if (msg.type === 'library-changed') {
+                fetchLibrary(true);
+              }
+            } catch (err) {}
+          };
+          es.onerror = () => {
+            es.close();
+            setTimeout(connectLiveStream, 5000);
+          };
+        } catch (e) {}
+      }
+
+      renderWaveformForTrack('init');
+      fetchLibrary(false);
+      connectLiveStream();
+    })();
+  </script>
+</body>
+</html>

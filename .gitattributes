@@ -1,2 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+*.mp3 binary
+*.wav binary
+*.flac binary
+*.m4a binary
+*.aac binary
+*.aiff binary
+*.aif binary
+*.ogg binary
+*.opus binary
